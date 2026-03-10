@@ -2,433 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WWF 2001 — Attitude Era Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0a0a;
-    --surface: #111111;
-    --surface2: #1a1a1a;
-    --border: #2a2a2a;
-    --text: #f0e6d3;
-    --text-muted: #7a7065;
-    --raw: #cc0000;
-    --raw-glow: #ff000040;
-    --smackdown: #0044cc;
-    --smackdown-glow: #0044cc40;
-    --ppv: #d4a017;
-    --ppv-glow: #d4a01740;
-    --check: #22c55e;
-    --accent: #cc0000;
-    --gold: #d4a017;
-  }
-  .light {
-    --bg: #f5f0e8;
-    --surface: #ffffff;
-    --surface2: #ede8df;
-    --border: #d4cfc5;
-    --text: #1a1410;
-    --text-muted: #8a8070;
-    --raw: #cc0000;
-    --smackdown: #0033bb;
-    --ppv: #b8890f;
-    --check: #16a34a;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Barlow Condensed', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    transition: background 0.3s, color 0.3s;
-    overflow-x: hidden;
-  }
-
-  /* HEADER */
-  .header {
-    background: var(--surface);
-    border-bottom: 3px solid var(--raw);
-    padding: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(204,0,0,0.3);
-  }
-
-  .header-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .logo-block {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
-
-  .logo-wwf {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.8rem;
-    color: var(--raw);
-    letter-spacing: 2px;
-    line-height: 1;
-    text-shadow: 3px 3px 0 #000, 0 0 20px var(--raw-glow);
-  }
-
-  .logo-year {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    color: var(--gold);
-    letter-spacing: 3px;
-  }
-
-  .header-controls {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .btn-toggle-night {
-    background: var(--surface2);
-    border: 2px solid var(--border);
-    color: var(--text);
-    padding: 6px 14px;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    border-radius: 2px;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-  .btn-toggle-night:hover { border-color: var(--gold); color: var(--gold); }
-
-  /* STATS BAR */
-  .stats-bar {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 10px 16px;
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  .stat-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    letter-spacing: 1px;
-  }
-
-  .stat-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .stat-dot.raw { background: var(--raw); }
-  .stat-dot.smackdown { background: var(--smackdown); }
-  .stat-dot.ppv { background: var(--ppv); }
-  .stat-dot.all { background: var(--check); }
-
-  /* FILTERS */
-  .filters {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 14px 16px 0;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    padding: 6px 16px;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border: 2px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.2s;
-  }
-
-  .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
-  .filter-btn.active-all { border-color: var(--text); color: var(--text); background: var(--surface2); }
-  .filter-btn.active-raw { border-color: var(--raw); color: var(--raw); background: rgba(204,0,0,0.1); }
-  .filter-btn.active-smackdown { border-color: var(--smackdown); color: var(--smackdown); background: rgba(0,68,204,0.1); }
-  .filter-btn.active-ppv { border-color: var(--ppv); color: var(--ppv); background: rgba(212,160,23,0.1); }
-  .filter-btn.active-watched { border-color: var(--check); color: var(--check); background: rgba(34,197,94,0.1); }
-
-  /* MAIN */
-  .main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 16px;
-  }
-
-  /* MONTH GROUP */
-  .month-group { margin-bottom: 32px; }
-
-  .month-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
-    letter-spacing: 4px;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .month-count {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 400;
-    letter-spacing: 1px;
-  }
-
-  /* EVENT CARD */
-  .event-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--border);
-    margin-bottom: 8px;
-    border-radius: 2px;
-    overflow: hidden;
-    transition: all 0.25s;
-    cursor: pointer;
-  }
-
-  .event-card:hover { transform: translateX(3px); }
-  .event-card.type-raw { border-left-color: var(--raw); }
-  .event-card.type-smackdown { border-left-color: var(--smackdown); }
-  .event-card.type-ppv { border-left-color: var(--ppv); }
-
-  .event-card.watched {
-    opacity: 0.55;
-  }
-
-  .event-card.watched .event-title {
-    text-decoration: line-through;
-    text-decoration-color: var(--check);
-  }
-
-  .event-main {
-    display: flex;
-    align-items: center;
-    padding: 12px 14px;
-    gap: 12px;
-  }
-
-  /* CHECKBOX */
-  .check-btn {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
-    font-size: 14px;
-    color: transparent;
-  }
-
-  .event-card.type-raw .check-btn:hover { border-color: var(--raw); }
-  .event-card.type-smackdown .check-btn:hover { border-color: var(--smackdown); }
-  .event-card.type-ppv .check-btn:hover { border-color: var(--ppv); }
-
-  .event-card.watched .check-btn {
-    background: var(--check);
-    border-color: var(--check);
-    color: #fff;
-  }
-
-  /* TYPE BADGE */
-  .type-badge {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-    padding: 2px 7px;
-    border-radius: 1px;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .badge-raw { background: transparent; color: #fff; padding: 0; overflow: hidden; line-height: 0; }
-  .badge-smackdown { background: transparent; color: #fff; padding: 0; overflow: hidden; line-height: 0; }
-  .badge-ppv { background: var(--ppv); color: #000; font-weight: 700; padding: 2px 7px; }
-
-  .badge-logo {
-    display: block;
-    width: 56px;
-    height: 28px;
-    object-fit: fill;
-    border-radius: 2px;
-  }
-
-  .event-info { flex: 1; min-width: 0; }
-
-  .event-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .event-date {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  .expand-icon {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    flex-shrink: 0;
-    transition: transform 0.2s;
-  }
-
-  .event-card.open .expand-icon { transform: rotate(180deg); }
-
-  /* DETAIL PANEL */
-  .event-detail {
-    display: none;
-    padding: 0 14px 14px 54px;
-    font-size: 0.88rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-    border-top: 1px solid var(--border);
-    padding-top: 10px;
-  }
-
-  .event-card.open .event-detail { display: block; }
-
-  .detail-section { margin-bottom: 8px; }
-
-  .detail-label {
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 3px;
-  }
-
-  .detail-value {
-    color: var(--text);
-    font-size: 0.85rem;
-  }
-
-  /* PPV special glow */
-  .event-card.type-ppv {
-    box-shadow: inset 0 0 0 1px rgba(212,160,23,0.15);
-  }
-
-  .event-card.type-ppv .event-title {
-    color: var(--ppv);
-  }
-
-  /* PROGRESS */
-  .progress-bar-wrap {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 6px 16px 16px;
-  }
-
-  .progress-label {
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 2px;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-  }
-
-  .progress-bg {
-    height: 5px;
-    background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--raw), var(--gold));
-    border-radius: 3px;
-    transition: width 0.4s ease;
-  }
-
-  /* EMPTY STATE */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
-    letter-spacing: 3px;
-  }
-
-  /* SCROLL TOP */
-  .scroll-top {
-    position: fixed;
-    bottom: 20px; right: 20px;
-    width: 42px; height: 42px;
-    background: var(--raw);
-    color: #fff;
-    border: none;
-    border-radius: 2px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(204,0,0,0.4);
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 50;
-  }
-  .scroll-top.visible { opacity: 1; }
-
-  @media (max-width: 480px) {
-    .logo-wwf { font-size: 2rem; }
-    .event-title { font-size: 0.9rem; }
-    .event-detail { padding-left: 14px; }
-    .type-badge { display: none; }
-    .filters { gap: 6px; }
-    .filter-btn { padding: 5px 10px; font-size: 0.72rem; }
-  }
-</style>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>WWF 2001 — Attitude Era</title>
 <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIldXRiAyMDAxIEF0dGl0dWRlIEVyYSBUcmFja2VyIiwgInNob3J0X25hbWUiOiAiV1dGIDIwMDEiLCAiZGVzY3JpcHRpb24iOiAiVHJhY2tlciBkZSBldmVudG9zIFdXRiBBdHRpdHVkZSBFcmEgMjAwMSAtIFJBVywgU21hY2tEb3duIHkgUFBWcyIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGEwYTBhIiwgInRoZW1lX2NvbG9yIjogIiNjYzAwMDAiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQTFNVElnTlRFeUlpQjNhV1IwYUQwaU1Ua3lJaUJvWldsbmFIUTlJakU1TWlJK0NpQWdQR1JsWm5NK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1KbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXdJaUI1TWowaU1TSStDaUFnSUNBZ0lEeHpkRzl3SUc5bVpuTmxkRDBpTUNVaUlITjBiM0F0WTI5c2IzSTlJaU14WVRBd01EQWlMejRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJeE1EQWxJaUJ6ZEc5d0xXTnZiRzl5UFNJak1HRXdZVEJoSWk4K0NpQWdJQ0E4TDJ4cGJtVmhja2R5WVdScFpXNTBQZ29nSUNBZ1BHeHBibVZoY2tkeVlXUnBaVzUwSUdsa1BTSnlaV1FpSUhneFBTSXdJaUI1TVQwaU1DSWdlREk5SWpBaUlIa3lQU0l4SWo0S0lDQWdJQ0FnUEhOMGIzQWdiMlptYzJWMFBTSXdKU0lnYzNSdmNDMWpiMnh2Y2owaUkyWm1Nakl3TUNJdlBnb2dJQ0FnSUNBOGMzUnZjQ0J2Wm1aelpYUTlJakV3TUNVaUlITjBiM0F0WTI5c2IzSTlJaU01T1RBd01EQWlMejRLSUNBZ0lEd3ZiR2x1WldGeVIzSmhaR2xsYm5RK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1kdmJHUWlJSGd4UFNJd0lpQjVNVDBpTUNJZ2VESTlJakFpSUhreVBTSXhJajRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJd0pTSWdjM1J2Y0MxamIyeHZjajBpSTJZMVl6VXhPQ0l2UGdvZ0lDQWdJQ0E4YzNSdmNDQnZabVp6WlhROUlqRXdNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTmlPRGc1TUdZaUx6NEtJQ0FnSUR3dmJHbHVaV0Z5UjNKaFpHbGxiblErQ2lBZ1BDOWtaV1p6UGdvZ0lEeHlaV04wSUhkcFpIUm9QU0l4T1RJaUlHaGxhV2RvZEQwaU1Ua3lJaUJtYVd4c1BTSjFjbXdvSTJKbktTSWdjbmc5SWpnd0lpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlNQ0lnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJeE5DSWdabWxzYkQwaWRYSnNLQ055WldRcElpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlORGs0SWlCM2FXUjBhRDBpTlRFeUlpQm9aV2xuYUhROUlqRTBJaUJtYVd4c1BTSjFjbXdvSTNKbFpDa2lMejRLSUNBOGNtVmpkQ0I0UFNJeE9DSWdlVDBpTVRnaUlIZHBaSFJvUFNJME56WWlJR2hsYVdkb2REMGlORGMySWlCbWFXeHNQU0p1YjI1bElpQnpkSEp2YTJVOUluVnliQ2dqWjI5c1pDa2lJSE4wY205clpTMTNhV1IwYUQwaU5DSWdjbmc5SWpZd0lpOCtDaUFnUEhSbGVIUWdlRDBpTWpVMklpQjVQU0l5TVRBaUlHWnZiblF0Wm1GdGFXeDVQU0pCY21saGJDQkNiR0ZqYXl4SmJYQmhZM1FzYzJGdWN5MXpaWEpwWmlJZ1ptOXVkQzF6YVhwbFBTSXhOekFpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJblZ5YkNnamNtVmtLU0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJZ1pHOXRhVzVoYm5RdFltRnpaV3hwYm1VOUltMXBaR1JzWlNJZ2JHVjBkR1Z5TFhOd1lXTnBibWM5SWkwMElqNVhWMFk4TDNSbGVIUStDaUFnUEhKbFkzUWdlRDBpTmpBaUlIazlJakkxT0NJZ2QybGtkR2c5SWpNNU1pSWdhR1ZwWjJoMFBTSTJJaUJtYVd4c1BTSjFjbXdvSTJkdmJHUXBJaUJ5ZUQwaU15SXZQZ29nSUR4MFpYaDBJSGc5SWpJMU5pSWdlVDBpTXpNd0lpQm1iMjUwTFdaaGJXbHNlVDBpUVhKcFlXd2dRbXhoWTJzc1NXMXdZV04wTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlOeklpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJbmRvYVhSbElpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJrYjIxcGJtRnVkQzFpWVhObGJHbHVaVDBpYldsa1pHeGxJaUJzWlhSMFpYSXRjM0JoWTJsdVp6MGlPQ0krTWpBd01Ud3ZkR1Y0ZEQ0S0lDQThkR1Y0ZENCNFBTSXlOVFlpSUhrOUlqUXdNQ0lnWm05dWRDMW1ZVzFwYkhrOUlrRnlhV0ZzTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlNekFpSUdadmJuUXRkMlZwWjJoMFBTSTNNREFpSUdacGJHdzlJaU5rTkdFd01UY2lJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpSUdSdmJXbHVZVzUwTFdKaGMyVnNhVzVsUFNKdGFXUmtiR1VpSUd4bGRIUmxjaTF6Y0dGamFXNW5QU0k0SWo1QlZGUkpWRlZFUlNCRlVrRThMM1JsZUhRK0NpQWdQR05wY21Oc1pTQmplRDBpT0RBaUlHTjVQU0kwTkRBaUlISTlJalVpSUdacGJHdzlJaU5qWXpBd01EQWlJRzl3WVdOcGRIazlJakF1TnlJdlBnb2dJRHhqYVhKamJHVWdZM2c5SWpJMU5pSWdZM2s5SWpRMk1DSWdjajBpTkNJZ1ptbHNiRDBpSTJRMFlUQXhOeUlnYjNCaFkybDBlVDBpTUM0MklpOCtDaUFnUEdOcGNtTnNaU0JqZUQwaU5ETXlJaUJqZVQwaU5EUXdJaUJ5UFNJMUlpQm1hV3hzUFNJalkyTXdNREF3SWlCdmNHRmphWFI1UFNJd0xqY2lMejRLUEM5emRtYysiLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifSwgeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQTFNVElnTlRFeUlpQjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJK0NpQWdQR1JsWm5NK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1KbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXdJaUI1TWowaU1TSStDaUFnSUNBZ0lEeHpkRzl3SUc5bVpuTmxkRDBpTUNVaUlITjBiM0F0WTI5c2IzSTlJaU14WVRBd01EQWlMejRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJeE1EQWxJaUJ6ZEc5d0xXTnZiRzl5UFNJak1HRXdZVEJoSWk4K0NpQWdJQ0E4TDJ4cGJtVmhja2R5WVdScFpXNTBQZ29nSUNBZ1BHeHBibVZoY2tkeVlXUnBaVzUwSUdsa1BTSnlaV1FpSUhneFBTSXdJaUI1TVQwaU1DSWdlREk5SWpBaUlIa3lQU0l4SWo0S0lDQWdJQ0FnUEhOMGIzQWdiMlptYzJWMFBTSXdKU0lnYzNSdmNDMWpiMnh2Y2owaUkyWm1Nakl3TUNJdlBnb2dJQ0FnSUNBOGMzUnZjQ0J2Wm1aelpYUTlJakV3TUNVaUlITjBiM0F0WTI5c2IzSTlJaU01T1RBd01EQWlMejRLSUNBZ0lEd3ZiR2x1WldGeVIzSmhaR2xsYm5RK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1kdmJHUWlJSGd4UFNJd0lpQjVNVDBpTUNJZ2VESTlJakFpSUhreVBTSXhJajRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJd0pTSWdjM1J2Y0MxamIyeHZjajBpSTJZMVl6VXhPQ0l2UGdvZ0lDQWdJQ0E4YzNSdmNDQnZabVp6WlhROUlqRXdNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTmlPRGc1TUdZaUx6NEtJQ0FnSUR3dmJHbHVaV0Z5UjNKaFpHbGxiblErQ2lBZ1BDOWtaV1p6UGdvZ0lEeHlaV04wSUhkcFpIUm9QU0kxTVRJaUlHaGxhV2RvZEQwaU5URXlJaUJtYVd4c1BTSjFjbXdvSTJKbktTSWdjbmc5SWpnd0lpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlNQ0lnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJeE5DSWdabWxzYkQwaWRYSnNLQ055WldRcElpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlORGs0SWlCM2FXUjBhRDBpTlRFeUlpQm9aV2xuYUhROUlqRTBJaUJtYVd4c1BTSjFjbXdvSTNKbFpDa2lMejRLSUNBOGNtVmpkQ0I0UFNJeE9DSWdlVDBpTVRnaUlIZHBaSFJvUFNJME56WWlJR2hsYVdkb2REMGlORGMySWlCbWFXeHNQU0p1YjI1bElpQnpkSEp2YTJVOUluVnliQ2dqWjI5c1pDa2lJSE4wY205clpTMTNhV1IwYUQwaU5DSWdjbmc5SWpZd0lpOCtDaUFnUEhSbGVIUWdlRDBpTWpVMklpQjVQU0l5TVRBaUlHWnZiblF0Wm1GdGFXeDVQU0pCY21saGJDQkNiR0ZqYXl4SmJYQmhZM1FzYzJGdWN5MXpaWEpwWmlJZ1ptOXVkQzF6YVhwbFBTSXhOekFpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJblZ5YkNnamNtVmtLU0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJZ1pHOXRhVzVoYm5RdFltRnpaV3hwYm1VOUltMXBaR1JzWlNJZ2JHVjBkR1Z5TFhOd1lXTnBibWM5SWkwMElqNVhWMFk4TDNSbGVIUStDaUFnUEhKbFkzUWdlRDBpTmpBaUlIazlJakkxT0NJZ2QybGtkR2c5SWpNNU1pSWdhR1ZwWjJoMFBTSTJJaUJtYVd4c1BTSjFjbXdvSTJkdmJHUXBJaUJ5ZUQwaU15SXZQZ29nSUR4MFpYaDBJSGc5SWpJMU5pSWdlVDBpTXpNd0lpQm1iMjUwTFdaaGJXbHNlVDBpUVhKcFlXd2dRbXhoWTJzc1NXMXdZV04wTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlOeklpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJbmRvYVhSbElpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJrYjIxcGJtRnVkQzFpWVhObGJHbHVaVDBpYldsa1pHeGxJaUJzWlhSMFpYSXRjM0JoWTJsdVp6MGlPQ0krTWpBd01Ud3ZkR1Y0ZEQ0S0lDQThkR1Y0ZENCNFBTSXlOVFlpSUhrOUlqUXdNQ0lnWm05dWRDMW1ZVzFwYkhrOUlrRnlhV0ZzTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlNekFpSUdadmJuUXRkMlZwWjJoMFBTSTNNREFpSUdacGJHdzlJaU5rTkdFd01UY2lJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpSUdSdmJXbHVZVzUwTFdKaGMyVnNhVzVsUFNKdGFXUmtiR1VpSUd4bGRIUmxjaTF6Y0dGamFXNW5QU0k0SWo1QlZGUkpWRlZFUlNCRlVrRThMM1JsZUhRK0NpQWdQR05wY21Oc1pTQmplRDBpT0RBaUlHTjVQU0kwTkRBaUlISTlJalVpSUdacGJHdzlJaU5qWXpBd01EQWlJRzl3WVdOcGRIazlJakF1TnlJdlBnb2dJRHhqYVhKamJHVWdZM2c5SWpJMU5pSWdZM2s5SWpRMk1DSWdjajBpTkNJZ1ptbHNiRDBpSTJRMFlUQXhOeUlnYjNCaFkybDBlVDBpTUM0MklpOCtDaUFnUEdOcGNtTnNaU0JqZUQwaU5ETXlJaUJqZVQwaU5EUXdJaUJ5UFNJMUlpQm1hV3hzUFNJalkyTXdNREF3SWlCdmNHRmphWFI1UFNJd0xqY2lMejRLUEM5emRtYysiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifV19">
 <meta name="theme-color" content="#cc0000">
 <meta name="mobile-web-app-capable" content="yes">
@@ -437,47 +12,177 @@
 <meta name="apple-mobile-web-app-title" content="WWF 2001">
 <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTAwMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGEwYTBhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyZWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmMjIwMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTAwMDAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImdvbGQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y1YzUxOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNiODg5MGYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjgwIi8+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSIxNCIgZmlsbD0idXJsKCNyZWQpIi8+CiAgPHJlY3QgeD0iMCIgeT0iNDk4IiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjE0IiBmaWxsPSJ1cmwoI3JlZCkiLz4KICA8cmVjdCB4PSIxOCIgeT0iMTgiIHdpZHRoPSI0NzYiIGhlaWdodD0iNDc2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ29sZCkiIHN0cm9rZS13aWR0aD0iNCIgcng9IjYwIi8+CiAgPHRleHQgeD0iMjU2IiB5PSIyMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNzAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjcmVkKSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii00Ij5XV0Y8L3RleHQ+CiAgPHJlY3QgeD0iNjAiIHk9IjI1OCIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI2IiBmaWxsPSJ1cmwoI2dvbGQpIiByeD0iMyIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzMwIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssSW1wYWN0LHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iOCI+MjAwMTwvdGV4dD4KICA8dGV4dCB4PSIyNTYiIHk9IjQwMCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNkNGEwMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI4Ij5BVFRJVFVERSBFUkE8L3RleHQ+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI0NDAiIHI9IjUiIGZpbGw9IiNjYzAwMDAiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjQ2MCIgcj0iNCIgZmlsbD0iI2Q0YTAxNyIgb3BhY2l0eT0iMC42Ii8+CiAgPGNpcmNsZSBjeD0iNDMyIiBjeT0iNDQwIiByPSI1IiBmaWxsPSIjY2MwMDAwIiBvcGFjaXR5PSIwLjciLz4KPC9zdmc+">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTAwMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGEwYTBhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyZWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmMjIwMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTAwMDAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImdvbGQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y1YzUxOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNiODg5MGYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjgwIi8+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSIxNCIgZmlsbD0idXJsKCNyZWQpIi8+CiAgPHJlY3QgeD0iMCIgeT0iNDk4IiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjE0IiBmaWxsPSJ1cmwoI3JlZCkiLz4KICA8cmVjdCB4PSIxOCIgeT0iMTgiIHdpZHRoPSI0NzYiIGhlaWdodD0iNDc2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ29sZCkiIHN0cm9rZS13aWR0aD0iNCIgcng9IjYwIi8+CiAgPHRleHQgeD0iMjU2IiB5PSIyMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNzAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjcmVkKSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii00Ij5XV0Y8L3RleHQ+CiAgPHJlY3QgeD0iNjAiIHk9IjI1OCIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI2IiBmaWxsPSJ1cmwoI2dvbGQpIiByeD0iMyIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzMwIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssSW1wYWN0LHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iOCI+MjAwMTwvdGV4dD4KICA8dGV4dCB4PSIyNTYiIHk9IjQwMCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNkNGEwMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI4Ij5BVFRJVFVERSBFUkE8L3RleHQ+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI0NDAiIHI9IjUiIGZpbGw9IiNjYzAwMDAiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjQ2MCIgcj0iNCIgZmlsbD0iI2Q0YTAxNyIgb3BhY2l0eT0iMC42Ii8+CiAgPGNpcmNsZSBjeD0iNDMyIiBjeT0iNDQwIiByPSI1IiBmaWxsPSIjY2MwMDAwIiBvcGFjaXR5PSIwLjciLz4KPC9zdmc+">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080808; --bg2:#0e0e0e; --card:#111112; --card2:#181819;
+  --border:#242424; --border2:#2e2e2e; --text:#ede8e0; --muted:#5a5550; --muted2:#8a847c;
+  --raw:#e8000a; --rawdim:rgba(232,0,10,0.12); --rawglow:rgba(232,0,10,0.35);
+  --sd:#1155e8; --sddim:rgba(17,85,232,0.12); --sdglow:rgba(17,85,232,0.35);
+  --ppv:#c8920a; --ppvdim:rgba(200,146,10,0.12); --ppvglow:rgba(200,146,10,0.35);
+  --green:#1db954; --greendim:rgba(29,185,84,0.15); --r:8px;
+}
+.day {
+  --bg:#f0ebe3; --bg2:#e8e2db; --card:#fff; --card2:#f5f0ea;
+  --border:#ddd8d0; --border2:#ccc7bf; --text:#18150f; --muted:#9a9088; --muted2:#6a6058;
+  --rawdim:rgba(232,0,10,0.06); --sddim:rgba(17,85,232,0.06); --ppvdim:rgba(200,146,10,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .25s,color .25s;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.025;pointer-events:none;z-index:0;}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border);}
+.hdr-top{max-width:860px;margin:0 auto;padding:14px 18px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;line-height:1;}
+.logo-wwf{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--raw);letter-spacing:3px;animation:pglow 3s ease-in-out infinite;}
+@keyframes pglow{0%,100%{text-shadow:0 0 20px var(--rawglow);}50%{text-shadow:0 0 40px var(--rawglow),0 0 60px rgba(232,0,10,.15);}}
+.logo-divider{width:1px;height:36px;background:linear-gradient(180deg,transparent,var(--border2),transparent);}
+.logo-sub{display:flex;flex-direction:column;gap:2px;}
+.logo-year{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--ppv);letter-spacing:5px;}
+.logo-era{font-family:'DM Mono',monospace;font-size:0.48rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;}
+.night-btn{width:42px;height:24px;background:var(--border2);border:none;border-radius:12px;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0;}
+.night-btn::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;background:var(--muted2);border-radius:50%;transition:transform .3s,background .3s;}
+.night-btn.on{background:var(--raw);}
+.night-btn.on::after{transform:translateX(18px);background:#fff;}
+
+/* PROGRESS */
+.hdr-prog{max-width:860px;margin:0 auto;padding:10px 18px 14px;display:flex;align-items:center;gap:12px;}
+.prog-track{flex:1;height:2px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--raw) 0%,var(--ppv) 100%);border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px var(--rawglow);}
+.prog-label{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--muted2);letter-spacing:1px;white-space:nowrap;}
+
+/* STATS */
+.stats{max-width:860px;margin:0 auto;padding:14px 18px 0;display:flex;gap:7px;flex-wrap:wrap;}
+.stat-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted2);letter-spacing:.5px;}
+.chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.chip-dot.r{background:var(--raw);box-shadow:0 0 5px var(--rawglow);}
+.chip-dot.s{background:var(--sd);box-shadow:0 0 5px var(--sdglow);}
+.chip-dot.p{background:var(--ppv);box-shadow:0 0 5px var(--ppvglow);}
+.chip-dot.g{background:var(--green);}
+
+/* FILTERS */
+.filters{max-width:860px;margin:0 auto;padding:12px 18px 0;display:flex;gap:6px;flex-wrap:wrap;}
+.f-btn{padding:5px 14px;font-family:'Rajdhani',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--border);background:transparent;color:var(--muted2);cursor:pointer;border-radius:20px;transition:all .2s;}
+.f-btn:hover{border-color:var(--muted2);color:var(--text);}
+.f-btn.fa{border-color:var(--border2);color:var(--text);background:var(--card2);}
+.f-btn.fr{border-color:var(--raw);color:var(--raw);background:var(--rawdim);}
+.f-btn.fs{border-color:var(--sd);color:var(--sd);background:var(--sddim);}
+.f-btn.fp{border-color:var(--ppv);color:var(--ppv);background:var(--ppvdim);}
+.f-btn.fw{border-color:var(--green);color:var(--green);background:var(--greendim);}
+.f-btn.fu{border-color:var(--border2);color:var(--muted2);background:var(--card2);}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:20px 18px 80px;position:relative;z-index:1;}
+
+/* MONTH GROUP */
+.month-group{margin-bottom:32px;}
+.month-hdr{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.month-name{font-family:'Bebas Neue',sans-serif;font-size:0.82rem;letter-spacing:5px;color:var(--muted);text-transform:uppercase;}
+.month-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent);}
+.month-count{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1px;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:5px;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;cursor:pointer;position:relative;animation:fadeUp .25s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:var(--r) 0 0 var(--r);}
+.card.raw::before{background:var(--raw);box-shadow:2px 0 10px var(--rawglow);}
+.card.smackdown::before{background:var(--sd);box-shadow:2px 0 10px var(--sdglow);}
+.card.ppv::before{background:linear-gradient(180deg,var(--ppv),#e8a800);box-shadow:2px 0 10px var(--ppvglow);}
+.card:hover{transform:translateX(3px);border-color:var(--border2);}
+.card.raw:hover{box-shadow:0 2px 16px var(--rawdim);}
+.card.smackdown:hover{box-shadow:0 2px 16px var(--sddim);}
+.card.ppv{background:linear-gradient(135deg,color-mix(in srgb,var(--card) 94%,#c8920a 6%),var(--card));border-color:rgba(200,146,10,.18);}
+.card.ppv:hover{box-shadow:0 2px 16px var(--ppvdim);}
+.card.done{opacity:.4;}
+.card.done .card-title{text-decoration:line-through;text-decoration-color:var(--green);}
+
+/* CARD MAIN ROW */
+.card-main{display:flex;align-items:center;padding:11px 14px 11px 16px;gap:10px;}
+.chk{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;}
+.card.raw .chk:hover{border-color:var(--raw);color:var(--raw);}
+.card.smackdown .chk:hover{border-color:var(--sd);color:var(--sd);}
+.card.ppv .chk:hover{border-color:var(--ppv);color:var(--ppv);}
+.card.done .chk{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 8px rgba(29,185,84,.4);}
+.badge{flex-shrink:0;border-radius:4px;overflow:hidden;line-height:0;}
+.badge img{display:block;width:50px;height:24px;object-fit:fill;border-radius:3px;}
+.badge-ppv{font-family:'Bebas Neue',sans-serif;font-size:0.68rem;letter-spacing:2px;padding:4px 8px;border-radius:4px;background:linear-gradient(135deg,#c8920a,#e8a800);color:#000;line-height:1;}
+.card-info{flex:1;min-width:0;}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:0.93rem;font-weight:700;letter-spacing:.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card.ppv .card-title{color:var(--ppv);}
+.card-date{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted2);margin-top:3px;letter-spacing:.5px;}
+.expand-btn{color:var(--muted);font-size:0.68rem;flex-shrink:0;transition:transform .25s ease,color .2s;padding:4px;}
+.card.open .expand-btn{transform:rotate(180deg);color:var(--text);}
+
+/* DETAIL */
+.card-detail{display:none;padding:0 16px 14px 50px;border-top:1px solid var(--border);}
+.card.open .card-detail{display:block;}
+.detail-grid{display:grid;grid-template-columns:1fr;gap:10px;padding-top:12px;}
+.detail-key{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
+.detail-val{font-size:0.85rem;font-weight:500;color:var(--muted2);line-height:1.55;}
+
+/* TO TOP */
+.to-top{position:fixed;bottom:24px;right:18px;z-index:200;width:44px;height:44px;background:var(--raw);border:none;border-radius:50%;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px var(--rawglow);opacity:0;transform:scale(.7);transition:opacity .3s,transform .3s;pointer-events:none;}
+.to-top.show{opacity:1;transform:scale(1);pointer-events:all;}
+.to-top:hover{transform:scale(1.1);}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:8px 18px;border-radius:20px;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:2px;z-index:300;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.3);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:80px 20px;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:4px;color:var(--muted);}
+
+@media(max-width:480px){
+  .logo-wwf{font-size:2rem;}
+  .card-main{padding:10px 12px 10px 14px;}
+  .card-title{font-size:0.85rem;}
+  .card-detail{padding-left:14px;}
+  .badge img{width:42px;height:21px;}
+}
+</style>
 </head>
 <body>
-
-<header class="header">
-  <div class="header-inner">
-    <div class="logo-block">
+<header class="hdr">
+  <div class="hdr-top">
+    <div class="logo">
       <span class="logo-wwf">WWF</span>
-      <span class="logo-year">ATTITUDE · 2001</span>
+      <div class="logo-divider"></div>
+      <div class="logo-sub">
+        <span class="logo-year">2001</span>
+        <span class="logo-era">Attitude Era</span>
+      </div>
     </div>
-    <div class="header-controls">
-      <button class="btn-toggle-night" onclick="toggleNight()" id="nightBtn">☀ DÍA</button>
-    </div>
+    <button class="night-btn on" id="nightBtn" onclick="toggleNight()" title="Modo dia/noche"></button>
   </div>
-  <div class="progress-bar-wrap">
-    <div class="progress-label" id="progressLabel">0 / 0 VISTOS</div>
-    <div class="progress-bg"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="hdr-prog">
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <span class="prog-label" id="progLabel">0 / 0</span>
   </div>
 </header>
 
-<div class="stats-bar">
-  <div class="stat-item"><span class="stat-dot raw"></span><span id="statRaw">RAW: 0</span></div>
-  <div class="stat-item"><span class="stat-dot smackdown"></span><span id="statSD">SD!: 0</span></div>
-  <div class="stat-item"><span class="stat-dot ppv"></span><span id="statPPV">PPV: 0</span></div>
-  <div class="stat-item"><span class="stat-dot all"></span><span id="statWatched">✓ 0</span></div>
+<div class="stats">
+  <div class="stat-chip"><span class="chip-dot r"></span><span id="sRaw">RAW 0/0</span></div>
+  <div class="stat-chip"><span class="chip-dot s"></span><span id="sSd">SD! 0/0</span></div>
+  <div class="stat-chip"><span class="chip-dot p"></span><span id="sPpv">PPV 0/0</span></div>
+  <div class="stat-chip"><span class="chip-dot g"></span><span id="sAll">0 vistos</span></div>
 </div>
 
 <div class="filters">
-  <button class="filter-btn active-all" onclick="setFilter('all',this)">TODO</button>
-  <button class="filter-btn" onclick="setFilter('raw',this)">RAW</button>
-  <button class="filter-btn" onclick="setFilter('smackdown',this)">SMACKDOWN</button>
-  <button class="filter-btn" onclick="setFilter('ppv',this)">PPV</button>
-  <button class="filter-btn" onclick="setFilter('watched',this)">✓ VISTOS</button>
-  <button class="filter-btn" onclick="setFilter('unwatched',this)">⬜ PENDIENTES</button>
+  <button class="f-btn fa" onclick="setFilter('all',this)">Todo</button>
+  <button class="f-btn"    onclick="setFilter('raw',this)">RAW</button>
+  <button class="f-btn"    onclick="setFilter('smackdown',this)">SmackDown</button>
+  <button class="f-btn"    onclick="setFilter('ppv',this)">PPV</button>
+  <button class="f-btn"    onclick="setFilter('watched',this)">Vistos</button>
+  <button class="f-btn"    onclick="setFilter('unwatched',this)">Pendientes</button>
 </div>
 
 <main class="main" id="mainList"></main>
-
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲</button>
+<button class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#9650;</button>
+<div class="toast" id="toast"></div>
 
 <script>
 const MONTHS = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+const RAW_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNDgiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDgiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmYyMjAwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzg4MDAwMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNyZykiIHJ4PSIyIi8+CiAgPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjExNCIgaGVpZ2h0PSI0MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmY2NjQ0IiBzdHJva2Utd2lkdGg9IjEiIHJ4PSIxIiBvcGFjaXR5PSIwLjUiLz4KICA8dGV4dCB4PSI2MCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI0Ij5SQVc8L3RleHQ+CiAgPHRleHQgeD0iNjAiIHk9IjM4IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZjY2FhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNSI+SVMgIFdBUjwvdGV4dD4KPC9zdmc+';
+const SD_LOGO  = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNDgiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDgiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJzZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDA1NWRkIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMTE3NyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNzZykiIHJ4PSIyIi8+CiAgPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjExNCIgaGVpZ2h0PSI0MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDQ4OGZmIiBzdHJva2Utd2lkdGg9IjEiIHJ4PSIxIiBvcGFjaXR5PSIwLjUiLz4KICA8dGV4dCB4PSI2MCIgeT0iMTkiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxIj5TTUFDSzwvdGV4dD4KICA8bGluZSB4MT0iMTAiIHkxPSIyOCIgeDI9IjExMCIgeTI9IjI4IiBzdHJva2U9IiNmNWM1MTgiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC42Ii8+CiAgPHRleHQgeD0iNjAiIHk9IjM4IiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssSW1wYWN0LHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNmNWM1MTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIyIj5ET1dOITwvdGV4dD4KPC9zdmc+';
 
 const EVENTS = [
   // ENERO
@@ -618,22 +323,22 @@ const EVENTS = [
   {id:113, type:'raw', title:'RAW IS WAR #447', date:'2001-12-31', info:'ÚLTIMO RAW DEL 2001. New Year\'s Eve RAW. El año más loco del wrestling cierra con una explosión. Chris Jericho, Triple H, Kurt Angle, Steve Austin todos en el ring. La Attitude Era despide 2001 en grande.', main:'NEW YEAR\'S EVE RAW 2001 | Full star-studded card | Attitude Era closes 2001', network:'USA Network'}
 ];
 
+
 let watched = JSON.parse(localStorage.getItem('wwf2001') || '{}');
 let currentFilter = 'all';
 let isNight = true;
 
 function toggleNight() {
   isNight = !isNight;
-  document.body.classList.toggle('light', !isNight);
-  document.getElementById('nightBtn').textContent = isNight ? '☀ DÍA' : '🌙 NOCHE';
+  document.body.classList.toggle('day', !isNight);
+  document.getElementById('nightBtn').classList.toggle('on', isNight);
 }
 
 function setFilter(f, btn) {
   currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => {
-    b.className = 'filter-btn';
-  });
-  btn.className = `filter-btn active-${f}`;
+  document.querySelectorAll('.f-btn').forEach(b => b.className = 'f-btn');
+  const cls = {all:'fa',raw:'fr',smackdown:'fs',ppv:'fp',watched:'fw',unwatched:'fu'};
+  btn.className = 'f-btn ' + (cls[f] || 'fa');
   renderList();
 }
 
@@ -645,8 +350,7 @@ function toggleWatch(id) {
 }
 
 function toggleDetail(id) {
-  const card = document.getElementById('card-' + id);
-  card.classList.toggle('open');
+  document.getElementById('card-' + id).classList.toggle('open');
 }
 
 function renderList() {
@@ -658,162 +362,120 @@ function renderList() {
   else if (currentFilter === 'watched') filtered = EVENTS.filter(e => watched[e.id]);
   else if (currentFilter === 'unwatched') filtered = EVENTS.filter(e => !watched[e.id]);
 
-  if (filtered.length === 0) {
-    main.innerHTML = '<div class="empty-state">— NO HAY RESULTADOS —</div>';
-    updateStats();
-    return;
-  }
+  if (!filtered.length) { main.innerHTML = '<div class="empty">— SIN RESULTADOS —</div>'; updateStats(); return; }
 
-  // group by month
   const byMonth = {};
   filtered.forEach(e => {
-    const d = new Date(e.date + 'T12:00:00');
-    const m = d.getMonth();
+    const m = new Date(e.date + 'T12:00:00').getMonth();
     if (!byMonth[m]) byMonth[m] = [];
     byMonth[m].push(e);
   });
 
   let html = '';
-  Object.keys(byMonth).sort((a,b) => a-b).forEach(m => {
-    const events = byMonth[m];
-    const total = events.length;
-    const done = events.filter(e => watched[e.id]).length;
-    html += `<div class="month-group">
-      <div class="month-label">${MONTHS[m]} <span class="month-count">${done}/${total} vistos</span></div>`;
-    events.forEach(e => {
+  Object.keys(byMonth).sort((a,b)=>a-b).forEach(m => {
+    const evs = byMonth[m];
+    const done = evs.filter(e => watched[e.id]).length;
+    html += '<div class="month-group"><div class="month-hdr"><span class="month-name">' + MONTHS[m] + '</span><div class="month-line"></div><span class="month-count">' + done + '/' + evs.length + '</span></div>';
+    evs.forEach((e, idx) => {
       const d = new Date(e.date + 'T12:00:00');
-      const dayNames = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
-      const dateStr = `${dayNames[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()].substring(0,3)} ${d.getFullYear()}`;
+      const days = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
+      const dateStr = days[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].substring(0,3) + ' ' + d.getFullYear();
       const isW = watched[e.id];
-      const RAW_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNDgiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDgiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmYyMjAwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzg4MDAwMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNyZykiIHJ4PSIyIi8+CiAgPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjExNCIgaGVpZ2h0PSI0MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmY2NjQ0IiBzdHJva2Utd2lkdGg9IjEiIHJ4PSIxIiBvcGFjaXR5PSIwLjUiLz4KICA8dGV4dCB4PSI2MCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI0Ij5SQVc8L3RleHQ+CiAgPHRleHQgeD0iNjAiIHk9IjM4IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZjY2FhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNSI+SVMgIFdBUjwvdGV4dD4KPC9zdmc+';
-      const SD_LOGO  = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNDgiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDgiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJzZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDA1NWRkIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMTE3NyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNzZykiIHJ4PSIyIi8+CiAgPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjExNCIgaGVpZ2h0PSI0MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDQ4OGZmIiBzdHJva2Utd2lkdGg9IjEiIHJ4PSIxIiBvcGFjaXR5PSIwLjUiLz4KICA8dGV4dCB4PSI2MCIgeT0iMTkiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxIj5TTUFDSzwvdGV4dD4KICA8bGluZSB4MT0iMTAiIHkxPSIyOCIgeDI9IjExMCIgeTI9IjI4IiBzdHJva2U9IiNmNWM1MTgiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC42Ii8+CiAgPHRleHQgeD0iNjAiIHk9IjM4IiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssSW1wYWN0LHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNmNWM1MTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIyIj5ET1dOITwvdGV4dD4KPC9zdmc+';
-      const badgeClass = e.type === 'raw' ? 'badge-raw' : e.type === 'smackdown' ? 'badge-smackdown' : 'badge-ppv';
-      const badgeInner = e.type === 'raw'
-        ? `<img src="${RAW_LOGO}" class="badge-logo" alt="RAW" loading="lazy">`
-        : e.type === 'smackdown'
-        ? `<img src="${SD_LOGO}" class="badge-logo" alt="SmackDown!" loading="lazy">`
-        : 'PPV';
-      html += `<div class="event-card type-${e.type}${isW ? ' watched' : ''}" id="card-${e.id}">
-        <div class="event-main">
-          <button class="check-btn" onclick="event.stopPropagation(); toggleWatch(${e.id})" title="Marcar como visto">✓</button>
-          <span class="type-badge ${badgeClass}">${badgeInner}</span>
-          <div class="event-info" onclick="toggleDetail(${e.id})">
-            <div class="event-title">${e.title}</div>
-            <div class="event-date">${dateStr}</div>
-          </div>
-          <span class="expand-icon" onclick="toggleDetail(${e.id})">▾</span>
-        </div>
-        <div class="event-detail">
-          <div class="detail-section">
-            <div class="detail-label">📋 Descripción</div>
-            <div class="detail-value">${e.info}</div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-label">🥊 Main Event</div>
-            <div class="detail-value">${e.main}</div>
-          </div>
-          ${e.venue ? `<div class="detail-section"><div class="detail-label">📍 Venue</div><div class="detail-value">${e.venue}</div></div>` : ''}
-          ${e.network ? `<div class="detail-section"><div class="detail-label">📺 Canal</div><div class="detail-value">${e.network}</div></div>` : ''}
-        </div>
-      </div>`;
+      const animDelay = (idx * 0.04).toFixed(2);
+      let badge = '';
+      if (e.type === 'raw') badge = '<span class="badge"><img src="' + RAW_LOGO + '" alt="RAW" loading="lazy"></span>';
+      else if (e.type === 'smackdown') badge = '<span class="badge"><img src="' + SD_LOGO + '" alt="SmackDown" loading="lazy"></span>';
+      else badge = '<span class="badge-ppv">PPV</span>';
+
+      html += '<div class="card ' + e.type + (isW?' done':'') + '" id="card-' + e.id + '" style="animation-delay:' + animDelay + 's">';
+      html += '<div class="card-main">';
+      html += '<button class="chk" onclick="event.stopPropagation();toggleWatch(' + e.id + ')" title="Marcar visto">&#10003;</button>';
+      html += badge;
+      html += '<div class="card-info" onclick="toggleDetail(' + e.id + ')">';
+      html += '<div class="card-title">' + e.title + '</div>';
+      html += '<div class="card-date">' + dateStr + '</div>';
+      html += '</div>';
+      html += '<span class="expand-btn" onclick="toggleDetail(' + e.id + ')">&#9660;</span>';
+      html += '</div>';
+      html += '<div class="card-detail">';
+      html += '<div class="detail-grid">';
+      html += '<div><div class="detail-key">Descripcion</div><div class="detail-val">' + e.info + '</div></div>';
+      html += '<div><div class="detail-key">Main Event</div><div class="detail-val">' + e.main + '</div></div>';
+      if (e.venue) html += '<div><div class="detail-key">Venue</div><div class="detail-val">' + e.venue + '</div></div>';
+      if (e.network) html += '<div><div class="detail-key">Canal</div><div class="detail-val">' + e.network + '</div></div>';
+      html += '</div></div></div>';
     });
     html += '</div>';
   });
-
   main.innerHTML = html;
   updateStats();
 }
 
 function updateStats() {
-  const totalWatched = Object.keys(watched).length;
+  const tw = Object.keys(watched).length;
   const total = EVENTS.length;
-  const pct = total > 0 ? Math.round(totalWatched / total * 100) : 0;
-  document.getElementById('progressLabel').textContent = `${totalWatched} / ${total} VISTOS — ${pct}%`;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('statRaw').textContent = `RAW: ${EVENTS.filter(e=>e.type==='raw' && watched[e.id]).length}/${EVENTS.filter(e=>e.type==='raw').length}`;
-  document.getElementById('statSD').textContent = `SD!: ${EVENTS.filter(e=>e.type==='smackdown' && watched[e.id]).length}/${EVENTS.filter(e=>e.type==='smackdown').length}`;
-  document.getElementById('statPPV').textContent = `PPV: ${EVENTS.filter(e=>e.type==='ppv' && watched[e.id]).length}/${EVENTS.filter(e=>e.type==='ppv').length}`;
-  document.getElementById('statWatched').textContent = `✓ ${totalWatched}`;
+  const pct = total > 0 ? Math.round(tw/total*100) : 0;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = tw + ' / ' + total + '  ' + pct + '%';
+  document.getElementById('sRaw').textContent = 'RAW ' + EVENTS.filter(e=>e.type==='raw'&&watched[e.id]).length + '/' + EVENTS.filter(e=>e.type==='raw').length;
+  document.getElementById('sSd').textContent  = 'SD! ' + EVENTS.filter(e=>e.type==='smackdown'&&watched[e.id]).length + '/' + EVENTS.filter(e=>e.type==='smackdown').length;
+  document.getElementById('sPpv').textContent = 'PPV ' + EVENTS.filter(e=>e.type==='ppv'&&watched[e.id]).length + '/' + EVENTS.filter(e=>e.type==='ppv').length;
+  document.getElementById('sAll').textContent = tw + ' vistos';
 }
 
-// Save scroll position on scroll
-let scrollSaveTimer;
+// Scroll save/restore
+let scrollTimer;
 window.addEventListener('scroll', () => {
-  const btn = document.getElementById('scrollTop');
-  btn.classList.toggle('visible', window.scrollY > 300);
-
-  // Save scroll position debounced
-  clearTimeout(scrollSaveTimer);
-  scrollSaveTimer = setTimeout(() => {
+  document.getElementById('toTop').classList.toggle('show', window.scrollY > 300);
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
     localStorage.setItem('wwf2001_scroll', window.scrollY);
-
-    // Save visible month
-    const monthGroups = document.querySelectorAll('.month-group');
-    let currentMonth = '';
-    monthGroups.forEach(group => {
-      const rect = group.getBoundingClientRect();
-      if (rect.top <= 120) {
-        const label = group.querySelector('.month-label');
-        if (label) currentMonth = label.childNodes[0].textContent.trim();
+    const groups = document.querySelectorAll('.month-group');
+    let cur = '';
+    groups.forEach(g => {
+      if (g.getBoundingClientRect().top <= 120) {
+        const lbl = g.querySelector('.month-name');
+        if (lbl) cur = lbl.textContent.trim();
       }
     });
-    if (currentMonth) localStorage.setItem('wwf2001_month', currentMonth);
+    if (cur) localStorage.setItem('wwf2001_month', cur);
   }, 300);
 });
 
-// Restore scroll position after render
 function restoreScroll() {
-  const savedMonth = localStorage.getItem('wwf2001_month');
-  const savedScroll = parseInt(localStorage.getItem('wwf2001_scroll') || '0');
-
-  if (savedMonth && currentFilter === 'all') {
-    // Find the month group by label text and scroll to it
-    const monthGroups = document.querySelectorAll('.month-group');
-    for (const group of monthGroups) {
-      const label = group.querySelector('.month-label');
-      if (label && label.childNodes[0].textContent.trim() === savedMonth) {
+  const month = localStorage.getItem('wwf2001_month');
+  if (month && currentFilter === 'all') {
+    const groups = document.querySelectorAll('.month-group');
+    for (const g of groups) {
+      const lbl = g.querySelector('.month-name');
+      if (lbl && lbl.textContent.trim() === month) {
         setTimeout(() => {
-          const headerH = document.querySelector('.header').offsetHeight + 10;
-          const top = group.getBoundingClientRect().top + window.scrollY - headerH;
-          window.scrollTo({ top, behavior: 'instant' });
-        }, 50);
+          const hh = document.querySelector('.hdr').offsetHeight + 10;
+          window.scrollTo({ top: g.getBoundingClientRect().top + window.scrollY - hh, behavior: 'instant' });
+        }, 60);
         return;
       }
     }
-  } else if (savedScroll > 0) {
-    setTimeout(() => window.scrollTo({ top: savedScroll, behavior: 'instant' }), 50);
+  } else {
+    const s = parseInt(localStorage.getItem('wwf2001_scroll') || '0');
+    if (s > 0) setTimeout(() => window.scrollTo({ top: s, behavior: 'instant' }), 60);
   }
 }
 
-// Show toast with current month on load
-function showMonthToast(month) {
-  if (!month) return;
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
-    background:#cc0000; color:white; padding:8px 20px;
-    font-family:'Oswald',sans-serif; font-size:0.85rem; letter-spacing:2px;
-    border-radius:2px; z-index:200; opacity:0;
-    transition:opacity 0.3s; white-space:nowrap;
-    box-shadow: 0 4px 15px rgba(204,0,0,0.4);
-  `;
-  toast.textContent = '📍 ' + month;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.style.opacity = '1', 100);
-  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 2500);
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 renderList();
-const _savedMonth = localStorage.getItem('wwf2001_month');
+const savedMonth = localStorage.getItem('wwf2001_month');
 restoreScroll();
-if (_savedMonth) showMonthToast(_savedMonth);
-</script>
+if (savedMonth) showToast('📍 ' + savedMonth);
 
-<script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register("data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZSA9PiBzZWxmLnNraXBXYWl0aW5nKCkpOwpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2FjdGl2YXRlJywgZSA9PiBjbGllbnRzLmNsYWltKCkpOwpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZSA9PiB7CiAgZS5yZXNwb25kV2l0aChmZXRjaChlLnJlcXVlc3QpLmNhdGNoKCgpID0+IG5ldyBSZXNwb25zZSgnT2ZmbGluZSAtIFdXRiAyMDAxIFRyYWNrZXInKSkpOwp9KTs=").then(() => {
-    console.log('SW registered OK');
-  }).catch(err => console.log('SW skipped:', err));
+  navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJyxlPT5zZWxmLnNraXBXYWl0aW5nKCkpO3NlbGYuYWRkRXZlbnRMaXN0ZW5lcignYWN0aXZhdGUnLGU9PmNsaWVudHMuY2xhaW0oKSk7c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsZT0+e2UucmVzcG9uZFdpdGgoZmV0Y2goZS5yZXF1ZXN0KS5jYXRjaCgoKT0+bmV3IFJlc3BvbnNlKCdPZmZsaW5lJykpKTt9KTs=').catch(()=>{});
 }
 </script>
 </body>

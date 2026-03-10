@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WWF 2001 — Attitude Era Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #f0e6d3;
+    --text-muted: #7a7065;
+    --raw: #cc0000;
+    --raw-glow: #ff000040;
+    --smackdown: #0044cc;
+    --smackdown-glow: #0044cc40;
+    --ppv: #d4a017;
+    --ppv-glow: #d4a01740;
+    --check: #22c55e;
+    --accent: #cc0000;
+    --gold: #d4a017;
+  }
+  .light {
+    --bg: #f5f0e8;
+    --surface: #ffffff;
+    --surface2: #ede8df;
+    --border: #d4cfc5;
+    --text: #1a1410;
+    --text-muted: #8a8070;
+    --raw: #cc0000;
+    --smackdown: #0033bb;
+    --ppv: #b8890f;
+    --check: #16a34a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Barlow Condensed', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 3px solid var(--raw);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(204,0,0,0.3);
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .logo-block {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .logo-wwf {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: var(--raw);
+    letter-spacing: 2px;
+    line-height: 1;
+    text-shadow: 3px 3px 0 #000, 0 0 20px var(--raw-glow);
+  }
+
+  .logo-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+  }
+
+  .header-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-toggle-night {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    color: var(--text);
+    padding: 6px 14px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border-radius: 2px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .btn-toggle-night:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* STATS BAR */
+  .stats-bar {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 16px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  .stat-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stat-dot.raw { background: var(--raw); }
+  .stat-dot.smackdown { background: var(--smackdown); }
+  .stat-dot.ppv { background: var(--ppv); }
+  .stat-dot.all { background: var(--check); }
+
+  /* FILTERS */
+  .filters {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 16px 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+  .filter-btn.active-all { border-color: var(--text); color: var(--text); background: var(--surface2); }
+  .filter-btn.active-raw { border-color: var(--raw); color: var(--raw); background: rgba(204,0,0,0.1); }
+  .filter-btn.active-smackdown { border-color: var(--smackdown); color: var(--smackdown); background: rgba(0,68,204,0.1); }
+  .filter-btn.active-ppv { border-color: var(--ppv); color: var(--ppv); background: rgba(212,160,23,0.1); }
+  .filter-btn.active-watched { border-color: var(--check); color: var(--check); background: rgba(34,197,94,0.1); }
+
+  /* MAIN */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* MONTH GROUP */
+  .month-group { margin-bottom: 32px; }
+
+  .month-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 4px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .month-count {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
+
+  /* EVENT CARD */
+  .event-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+    margin-bottom: 8px;
+    border-radius: 2px;
+    overflow: hidden;
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+
+  .event-card:hover { transform: translateX(3px); }
+  .event-card.type-raw { border-left-color: var(--raw); }
+  .event-card.type-smackdown { border-left-color: var(--smackdown); }
+  .event-card.type-ppv { border-left-color: var(--ppv); }
+
+  .event-card.watched {
+    opacity: 0.55;
+  }
+
+  .event-card.watched .event-title {
+    text-decoration: line-through;
+    text-decoration-color: var(--check);
+  }
+
+  .event-main {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  /* CHECKBOX */
+  .check-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: transparent;
+  }
+
+  .event-card.type-raw .check-btn:hover { border-color: var(--raw); }
+  .event-card.type-smackdown .check-btn:hover { border-color: var(--smackdown); }
+  .event-card.type-ppv .check-btn:hover { border-color: var(--ppv); }
+
+  .event-card.watched .check-btn {
+    background: var(--check);
+    border-color: var(--check);
+    color: #fff;
+  }
+
+  /* TYPE BADGE */
+  .type-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    padding: 2px 7px;
+    border-radius: 1px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .badge-raw { background: transparent; color: #fff; padding: 0; overflow: hidden; line-height: 0; }
+  .badge-smackdown { background: transparent; color: #fff; padding: 0; overflow: hidden; line-height: 0; }
+  .badge-ppv { background: var(--ppv); color: #000; font-weight: 700; padding: 2px 7px; }
+
+  .badge-logo {
+    display: block;
+    width: 56px;
+    height: 28px;
+    object-fit: fill;
+    border-radius: 2px;
+  }
+
+  .event-info { flex: 1; min-width: 0; }
+
+  .event-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .event-date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .expand-icon {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .event-card.open .expand-icon { transform: rotate(180deg); }
+
+  /* DETAIL PANEL */
+  .event-detail {
+    display: none;
+    padding: 0 14px 14px 54px;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+
+  .event-card.open .event-detail { display: block; }
+
+  .detail-section { margin-bottom: 8px; }
+
+  .detail-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+
+  .detail-value {
+    color: var(--text);
+    font-size: 0.85rem;
+  }
+
+  /* PPV special glow */
+  .event-card.type-ppv {
+    box-shadow: inset 0 0 0 1px rgba(212,160,23,0.15);
+  }
+
+  .event-card.type-ppv .event-title {
+    color: var(--ppv);
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 6px 16px 16px;
+  }
+
+  .progress-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  .progress-bg {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--raw), var(--gold));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+  }
+
+  /* SCROLL TOP */
+  .scroll-top {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    width: 42px; height: 42px;
+    background: var(--raw);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(204,0,0,0.4);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 50;
+  }
+  .scroll-top.visible { opacity: 1; }
+
+  @media (max-width: 480px) {
+    .logo-wwf { font-size: 2rem; }
+    .event-title { font-size: 0.9rem; }
+    .event-detail { padding-left: 14px; }
+    .type-badge { display: none; }
+    .filters { gap: 6px; }
+    .filter-btn { padding: 5px 10px; font-size: 0.72rem; }
+  }
+</style>
+
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIldXRiAyMDAxIEF0dGl0dWRlIEVyYSBUcmFja2VyIiwgInNob3J0X25hbWUiOiAiV1dGIDIwMDEiLCAiZGVzY3JpcHRpb24iOiAiVHJhY2tlciBkZSBldmVudG9zIFdXRiBBdHRpdHVkZSBFcmEgMjAwMSAtIFJBVywgU21hY2tEb3duIHkgUFBWcyIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGEwYTBhIiwgInRoZW1lX2NvbG9yIjogIiNjYzAwMDAiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQTFNVElnTlRFeUlpQjNhV1IwYUQwaU1Ua3lJaUJvWldsbmFIUTlJakU1TWlJK0NpQWdQR1JsWm5NK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1KbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXdJaUI1TWowaU1TSStDaUFnSUNBZ0lEeHpkRzl3SUc5bVpuTmxkRDBpTUNVaUlITjBiM0F0WTI5c2IzSTlJaU14WVRBd01EQWlMejRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJeE1EQWxJaUJ6ZEc5d0xXTnZiRzl5UFNJak1HRXdZVEJoSWk4K0NpQWdJQ0E4TDJ4cGJtVmhja2R5WVdScFpXNTBQZ29nSUNBZ1BHeHBibVZoY2tkeVlXUnBaVzUwSUdsa1BTSnlaV1FpSUhneFBTSXdJaUI1TVQwaU1DSWdlREk5SWpBaUlIa3lQU0l4SWo0S0lDQWdJQ0FnUEhOMGIzQWdiMlptYzJWMFBTSXdKU0lnYzNSdmNDMWpiMnh2Y2owaUkyWm1Nakl3TUNJdlBnb2dJQ0FnSUNBOGMzUnZjQ0J2Wm1aelpYUTlJakV3TUNVaUlITjBiM0F0WTI5c2IzSTlJaU01T1RBd01EQWlMejRLSUNBZ0lEd3ZiR2x1WldGeVIzSmhaR2xsYm5RK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1kdmJHUWlJSGd4UFNJd0lpQjVNVDBpTUNJZ2VESTlJakFpSUhreVBTSXhJajRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJd0pTSWdjM1J2Y0MxamIyeHZjajBpSTJZMVl6VXhPQ0l2UGdvZ0lDQWdJQ0E4YzNSdmNDQnZabVp6WlhROUlqRXdNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTmlPRGc1TUdZaUx6NEtJQ0FnSUR3dmJHbHVaV0Z5UjNKaFpHbGxiblErQ2lBZ1BDOWtaV1p6UGdvZ0lEeHlaV04wSUhkcFpIUm9QU0l4T1RJaUlHaGxhV2RvZEQwaU1Ua3lJaUJtYVd4c1BTSjFjbXdvSTJKbktTSWdjbmc5SWpnd0lpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlNQ0lnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJeE5DSWdabWxzYkQwaWRYSnNLQ055WldRcElpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlORGs0SWlCM2FXUjBhRDBpTlRFeUlpQm9aV2xuYUhROUlqRTBJaUJtYVd4c1BTSjFjbXdvSTNKbFpDa2lMejRLSUNBOGNtVmpkQ0I0UFNJeE9DSWdlVDBpTVRnaUlIZHBaSFJvUFNJME56WWlJR2hsYVdkb2REMGlORGMySWlCbWFXeHNQU0p1YjI1bElpQnpkSEp2YTJVOUluVnliQ2dqWjI5c1pDa2lJSE4wY205clpTMTNhV1IwYUQwaU5DSWdjbmc5SWpZd0lpOCtDaUFnUEhSbGVIUWdlRDBpTWpVMklpQjVQU0l5TVRBaUlHWnZiblF0Wm1GdGFXeDVQU0pCY21saGJDQkNiR0ZqYXl4SmJYQmhZM1FzYzJGdWN5MXpaWEpwWmlJZ1ptOXVkQzF6YVhwbFBTSXhOekFpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJblZ5YkNnamNtVmtLU0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJZ1pHOXRhVzVoYm5RdFltRnpaV3hwYm1VOUltMXBaR1JzWlNJZ2JHVjBkR1Z5TFhOd1lXTnBibWM5SWkwMElqNVhWMFk4TDNSbGVIUStDaUFnUEhKbFkzUWdlRDBpTmpBaUlIazlJakkxT0NJZ2QybGtkR2c5SWpNNU1pSWdhR1ZwWjJoMFBTSTJJaUJtYVd4c1BTSjFjbXdvSTJkdmJHUXBJaUJ5ZUQwaU15SXZQZ29nSUR4MFpYaDBJSGc5SWpJMU5pSWdlVDBpTXpNd0lpQm1iMjUwTFdaaGJXbHNlVDBpUVhKcFlXd2dRbXhoWTJzc1NXMXdZV04wTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlOeklpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJbmRvYVhSbElpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJrYjIxcGJtRnVkQzFpWVhObGJHbHVaVDBpYldsa1pHeGxJaUJzWlhSMFpYSXRjM0JoWTJsdVp6MGlPQ0krTWpBd01Ud3ZkR1Y0ZEQ0S0lDQThkR1Y0ZENCNFBTSXlOVFlpSUhrOUlqUXdNQ0lnWm05dWRDMW1ZVzFwYkhrOUlrRnlhV0ZzTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlNekFpSUdadmJuUXRkMlZwWjJoMFBTSTNNREFpSUdacGJHdzlJaU5rTkdFd01UY2lJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpSUdSdmJXbHVZVzUwTFdKaGMyVnNhVzVsUFNKdGFXUmtiR1VpSUd4bGRIUmxjaTF6Y0dGamFXNW5QU0k0SWo1QlZGUkpWRlZFUlNCRlVrRThMM1JsZUhRK0NpQWdQR05wY21Oc1pTQmplRDBpT0RBaUlHTjVQU0kwTkRBaUlISTlJalVpSUdacGJHdzlJaU5qWXpBd01EQWlJRzl3WVdOcGRIazlJakF1TnlJdlBnb2dJRHhqYVhKamJHVWdZM2c5SWpJMU5pSWdZM2s5SWpRMk1DSWdjajBpTkNJZ1ptbHNiRDBpSTJRMFlUQXhOeUlnYjNCaFkybDBlVDBpTUM0MklpOCtDaUFnUEdOcGNtTnNaU0JqZUQwaU5ETXlJaUJqZVQwaU5EUXdJaUJ5UFNJMUlpQm1hV3hzUFNJalkyTXdNREF3SWlCdmNHRmphWFI1UFNJd0xqY2lMejRLUEM5emRtYysiLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifSwgeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQTFNVElnTlRFeUlpQjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJK0NpQWdQR1JsWm5NK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1KbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXdJaUI1TWowaU1TSStDaUFnSUNBZ0lEeHpkRzl3SUc5bVpuTmxkRDBpTUNVaUlITjBiM0F0WTI5c2IzSTlJaU14WVRBd01EQWlMejRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJeE1EQWxJaUJ6ZEc5d0xXTnZiRzl5UFNJak1HRXdZVEJoSWk4K0NpQWdJQ0E4TDJ4cGJtVmhja2R5WVdScFpXNTBQZ29nSUNBZ1BHeHBibVZoY2tkeVlXUnBaVzUwSUdsa1BTSnlaV1FpSUhneFBTSXdJaUI1TVQwaU1DSWdlREk5SWpBaUlIa3lQU0l4SWo0S0lDQWdJQ0FnUEhOMGIzQWdiMlptYzJWMFBTSXdKU0lnYzNSdmNDMWpiMnh2Y2owaUkyWm1Nakl3TUNJdlBnb2dJQ0FnSUNBOGMzUnZjQ0J2Wm1aelpYUTlJakV3TUNVaUlITjBiM0F0WTI5c2IzSTlJaU01T1RBd01EQWlMejRLSUNBZ0lEd3ZiR2x1WldGeVIzSmhaR2xsYm5RK0NpQWdJQ0E4YkdsdVpXRnlSM0poWkdsbGJuUWdhV1E5SW1kdmJHUWlJSGd4UFNJd0lpQjVNVDBpTUNJZ2VESTlJakFpSUhreVBTSXhJajRLSUNBZ0lDQWdQSE4wYjNBZ2IyWm1jMlYwUFNJd0pTSWdjM1J2Y0MxamIyeHZjajBpSTJZMVl6VXhPQ0l2UGdvZ0lDQWdJQ0E4YzNSdmNDQnZabVp6WlhROUlqRXdNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTmlPRGc1TUdZaUx6NEtJQ0FnSUR3dmJHbHVaV0Z5UjNKaFpHbGxiblErQ2lBZ1BDOWtaV1p6UGdvZ0lEeHlaV04wSUhkcFpIUm9QU0kxTVRJaUlHaGxhV2RvZEQwaU5URXlJaUJtYVd4c1BTSjFjbXdvSTJKbktTSWdjbmc5SWpnd0lpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlNQ0lnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJeE5DSWdabWxzYkQwaWRYSnNLQ055WldRcElpOCtDaUFnUEhKbFkzUWdlRDBpTUNJZ2VUMGlORGs0SWlCM2FXUjBhRDBpTlRFeUlpQm9aV2xuYUhROUlqRTBJaUJtYVd4c1BTSjFjbXdvSTNKbFpDa2lMejRLSUNBOGNtVmpkQ0I0UFNJeE9DSWdlVDBpTVRnaUlIZHBaSFJvUFNJME56WWlJR2hsYVdkb2REMGlORGMySWlCbWFXeHNQU0p1YjI1bElpQnpkSEp2YTJVOUluVnliQ2dqWjI5c1pDa2lJSE4wY205clpTMTNhV1IwYUQwaU5DSWdjbmc5SWpZd0lpOCtDaUFnUEhSbGVIUWdlRDBpTWpVMklpQjVQU0l5TVRBaUlHWnZiblF0Wm1GdGFXeDVQU0pCY21saGJDQkNiR0ZqYXl4SmJYQmhZM1FzYzJGdWN5MXpaWEpwWmlJZ1ptOXVkQzF6YVhwbFBTSXhOekFpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJblZ5YkNnamNtVmtLU0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJZ1pHOXRhVzVoYm5RdFltRnpaV3hwYm1VOUltMXBaR1JzWlNJZ2JHVjBkR1Z5TFhOd1lXTnBibWM5SWkwMElqNVhWMFk4TDNSbGVIUStDaUFnUEhKbFkzUWdlRDBpTmpBaUlIazlJakkxT0NJZ2QybGtkR2c5SWpNNU1pSWdhR1ZwWjJoMFBTSTJJaUJtYVd4c1BTSjFjbXdvSTJkdmJHUXBJaUJ5ZUQwaU15SXZQZ29nSUR4MFpYaDBJSGc5SWpJMU5pSWdlVDBpTXpNd0lpQm1iMjUwTFdaaGJXbHNlVDBpUVhKcFlXd2dRbXhoWTJzc1NXMXdZV04wTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlOeklpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJbmRvYVhSbElpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJrYjIxcGJtRnVkQzFpWVhObGJHbHVaVDBpYldsa1pHeGxJaUJzWlhSMFpYSXRjM0JoWTJsdVp6MGlPQ0krTWpBd01Ud3ZkR1Y0ZEQ0S0lDQThkR1Y0ZENCNFBTSXlOVFlpSUhrOUlqUXdNQ0lnWm05dWRDMW1ZVzFwYkhrOUlrRnlhV0ZzTEhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlNekFpSUdadmJuUXRkMlZwWjJoMFBTSTNNREFpSUdacGJHdzlJaU5rTkdFd01UY2lJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpSUdSdmJXbHVZVzUwTFdKaGMyVnNhVzVsUFNKdGFXUmtiR1VpSUd4bGRIUmxjaTF6Y0dGamFXNW5QU0k0SWo1QlZGUkpWRlZFUlNCRlVrRThMM1JsZUhRK0NpQWdQR05wY21Oc1pTQmplRDBpT0RBaUlHTjVQU0kwTkRBaUlISTlJalVpSUdacGJHdzlJaU5qWXpBd01EQWlJRzl3WVdOcGRIazlJakF1TnlJdlBnb2dJRHhqYVhKamJHVWdZM2c5SWpJMU5pSWdZM2s5SWpRMk1DSWdjajBpTkNJZ1ptbHNiRDBpSTJRMFlUQXhOeUlnYjNCaFkybDBlVDBpTUM0MklpOCtDaUFnUEdOcGNtTnNaU0JqZUQwaU5ETXlJaUJqZVQwaU5EUXdJaUJ5UFNJMUlpQm1hV3hzUFNJalkyTXdNREF3SWlCdmNHRmphWFI1UFNJd0xqY2lMejRLUEM5emRtYysiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifV19">
+<meta name="theme-color" content="#cc0000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WWF 2001">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTAwMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGEwYTBhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyZWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmMjIwMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTAwMDAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImdvbGQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y1YzUxOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNiODg5MGYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjgwIi8+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSIxNCIgZmlsbD0idXJsKCNyZWQpIi8+CiAgPHJlY3QgeD0iMCIgeT0iNDk4IiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjE0IiBmaWxsPSJ1cmwoI3JlZCkiLz4KICA8cmVjdCB4PSIxOCIgeT0iMTgiIHdpZHRoPSI0NzYiIGhlaWdodD0iNDc2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ29sZCkiIHN0cm9rZS13aWR0aD0iNCIgcng9IjYwIi8+CiAgPHRleHQgeD0iMjU2IiB5PSIyMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNzAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjcmVkKSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii00Ij5XV0Y8L3RleHQ+CiAgPHJlY3QgeD0iNjAiIHk9IjI1OCIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI2IiBmaWxsPSJ1cmwoI2dvbGQpIiByeD0iMyIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzMwIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssSW1wYWN0LHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iOCI+MjAwMTwvdGV4dD4KICA8dGV4dCB4PSIyNTYiIHk9IjQwMCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNkNGEwMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI4Ij5BVFRJVFVERSBFUkE8L3RleHQ+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI0NDAiIHI9IjUiIGZpbGw9IiNjYzAwMDAiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjQ2MCIgcj0iNCIgZmlsbD0iI2Q0YTAxNyIgb3BhY2l0eT0iMC42Ii8+CiAgPGNpcmNsZSBjeD0iNDMyIiBjeT0iNDQwIiByPSI1IiBmaWxsPSIjY2MwMDAwIiBvcGFjaXR5PSIwLjciLz4KPC9zdmc+">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTAwMDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGEwYTBhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyZWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmMjIwMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTAwMDAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImdvbGQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y1YzUxOCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNiODg5MGYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjgwIi8+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjUxMiIgaGVpZ2h0PSIxNCIgZmlsbD0idXJsKCNyZWQpIi8+CiAgPHJlY3QgeD0iMCIgeT0iNDk4IiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjE0IiBmaWxsPSJ1cmwoI3JlZCkiLz4KICA8cmVjdCB4PSIxOCIgeT0iMTgiIHdpZHRoPSI0NzYiIGhlaWdodD0iNDc2IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ29sZCkiIHN0cm9rZS13aWR0aD0iNCIgcng9IjYwIi8+CiAgPHRleHQgeD0iMjU2IiB5PSIyMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNzAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9InVybCgjcmVkKSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii00Ij5XV0Y8L3RleHQ+CiAgPHJlY3QgeD0iNjAiIHk9IjI1OCIgd2lkdGg9IjM5MiIgaGVpZ2h0PSI2IiBmaWxsPSJ1cmwoI2dvbGQpIiByeD0iMyIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzMwIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssSW1wYWN0LHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iOCI+MjAwMTwvdGV4dD4KICA8dGV4dCB4PSIyNTYiIHk9IjQwMCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNkNGEwMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI4Ij5BVFRJVFVERSBFUkE8L3RleHQ+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI0NDAiIHI9IjUiIGZpbGw9IiNjYzAwMDAiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjQ2MCIgcj0iNCIgZmlsbD0iI2Q0YTAxNyIgb3BhY2l0eT0iMC42Ii8+CiAgPGNpcmNsZSBjeD0iNDMyIiBjeT0iNDQwIiByPSI1IiBmaWxsPSIjY2MwMDAwIiBvcGFjaXR5PSIwLjciLz4KPC9zdmc+">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-block">
+      <span class="logo-wwf">WWF</span>
+      <span class="logo-year">ATTITUDE · 2001</span>
+    </div>
+    <div class="header-controls">
+      <button class="btn-toggle-night" onclick="toggleNight()" id="nightBtn">☀ DÍA</button>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-label" id="progressLabel">0 / 0 VISTOS</div>
+    <div class="progress-bg"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-item"><span class="stat-dot raw"></span><span id="statRaw">RAW: 0</span></div>
+  <div class="stat-item"><span class="stat-dot smackdown"></span><span id="statSD">SD!: 0</span></div>
+  <div class="stat-item"><span class="stat-dot ppv"></span><span id="statPPV">PPV: 0</span></div>
+  <div class="stat-item"><span class="stat-dot all"></span><span id="statWatched">✓ 0</span></div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active-all" onclick="setFilter('all',this)">TODO</button>
+  <button class="filter-btn" onclick="setFilter('raw',this)">RAW</button>
+  <button class="filter-btn" onclick="setFilter('smackdown',this)">SMACKDOWN</button>
+  <button class="filter-btn" onclick="setFilter('ppv',this)">PPV</button>
+  <button class="filter-btn" onclick="setFilter('watched',this)">✓ VISTOS</button>
+  <button class="filter-btn" onclick="setFilter('unwatched',this)">⬜ PENDIENTES</button>
+</div>
+
+<main class="main" id="mainList"></main>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲</button>
+
+<script>
+const MONTHS = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+
+const EVENTS = [
+  // ENERO
+  {id:1, type:'raw', title:'RAW IS WAR #397', date:'2001-01-01', info:'Primer RAW del año. Triple H regresa de su lesión. The Rock y Kurt Angle continúan su rivalidad.', main:'Triple H vs. Kurt Angle', network:'USA Network'},
+  {id:2, type:'smackdown', title:'SMACKDOWN #82', date:'2001-01-04', info:'Rematches de No Mercy. Edge & Christian se enfrentan a The Dudley Boyz por los títulos de pareja.', main:'Edge & Christian vs. Dudley Boyz', network:'UPN'},
+  {id:3, type:'raw', title:'RAW IS WAR #398', date:'2001-01-08', info:'Kurt Angle defiende el WWF Championship. Steve Austin hace aparición sorpresiva.', main:'Kurt Angle vs. Rikishi', network:'USA Network'},
+  {id:4, type:'smackdown', title:'SMACKDOWN #83', date:'2001-01-11', info:'Build-up para Royal Rumble. The Rock confronta al Commissioner William Regal.', main:'The Rock vs. William Regal', network:'UPN'},
+  {id:5, type:'raw', title:'RAW IS WAR #399', date:'2001-01-15', info:'Anuncio de participantes para Royal Rumble. Kane en acción contra varios rivales.', main:'Kane vs. Rikishi', network:'USA Network'},
+  {id:6, type:'smackdown', title:'SMACKDOWN #84', date:'2001-01-18', info:'Última parada antes de Royal Rumble. Kurt Angle cierra el show en segmento clave.', main:'Kurt Angle & Regal vs. Rock & Austin', network:'UPN'},
+  {id:7, type:'ppv', title:'ROYAL RUMBLE 2001', date:'2001-01-21', info:'PPV histórico. Steve Austin gana el Royal Rumble Match. Kurt Angle retiene el WWF Championship ante Triple H. The Hardy Boyz vs. Dudley Boyz vs. E&C en una brutal Triple Threat Ladder Match por los Tag Titles.', main:'Stone Cold gana el Rumble | Angle vs. HHH | Triple Threat Ladder Match', venue:'New Orleans Arena, Louisiana'},
+  {id:8, type:'raw', title:'RAW IS WAR #400', date:'2001-01-22', info:'EPISODIO 400 de RAW. Celebración especial. Steve Austin celebra su victoria en Royal Rumble.', main:'Steve Austin celebra + Angle vs. Rock', network:'USA Network'},
+  {id:9, type:'smackdown', title:'SMACKDOWN #85', date:'2001-01-25', info:'Aftermath del Royal Rumble. Austin reta a Kurt Angle para WrestleMania X-Seven.', main:'Austin & Undertaker vs. Kurt Angle & Regal', network:'UPN'},
+  {id:10, type:'raw', title:'RAW IS WAR #401', date:'2001-01-29', info:'Triple H busca revancha contra Kurt Angle. The Rock declara su lugar en WrestleMania.', main:'Triple H vs. Rikishi', network:'USA Network'},
+
+  // FEBRERO
+  {id:11, type:'smackdown', title:'SMACKDOWN #86', date:'2001-02-01', info:'Brutal episodio. Undertaker ataca a toda la nómina. Edge & Christian en acción.', main:'Undertaker vs. Kane', network:'UPN'},
+  {id:12, type:'raw', title:'RAW IS WAR #402', date:'2001-02-05', info:'Vince McMahon anuncia sorpresas para WrestleMania. The Rock vs. Austin se calienta.', main:'The Rock vs. Kurt Angle (No DQ)', network:'USA Network'},
+  {id:13, type:'smackdown', title:'SMACKDOWN #87', date:'2001-02-08', info:'Dudley Boyz atraviesan mesas a divas. Trish Stratus debut prominente como heel.', main:'Dudley Boyz vs. E&C vs. Hardy Boyz', network:'UPN'},
+  {id:14, type:'raw', title:'RAW IS WAR #403', date:'2001-02-12', info:'Valentine\'s Day special episode. Kurt Angle y Steve Austin firman contrato para No Way Out. Trish y Stephanie en conflicto con Vince McMahon.', main:'Steve Austin vs. Triple H | Angle vs. Undertaker', network:'USA Network'},
+  {id:15, type:'smackdown', title:'SMACKDOWN #88', date:'2001-02-15', info:'Promo épica de The Rock. Chris Jericho en bitter feud con Chris Benoit.', main:'The Rock vs. Chris Benoit', network:'UPN'},
+  {id:16, type:'raw', title:'RAW IS WAR #404', date:'2001-02-19', info:'Go-home show para No Way Out. Austin y Angle cara a cara en segmento tenso.', main:'Austin & Rock vs. Angle & Triple H', network:'USA Network'},
+  {id:17, type:'smackdown', title:'SMACKDOWN #89', date:'2001-02-22', info:'No Way Out build-up final. Vince McMahon confirma el main event de WrestleMania.', main:'Kurt Angle vs. The Rock', network:'UPN'},
+  {id:18, type:'ppv', title:'NO WAY OUT 2001', date:'2001-02-25', info:'Kurt Angle vs. Triple H en Two Out of Three Falls por el WWF Title. Steve Austin vs. Triple H también programado. The Rock vs. Angle como sub-story. La noche cambia el curso hacia WrestleMania.', main:'Angle vs. Triple H (2/3 Falls) | Austin vs. Triple H | TLC', venue:'Thomas & Mack Center, Las Vegas'},
+  {id:19, type:'raw', title:'RAW IS WAR #405', date:'2001-02-26', info:'Post-No Way Out. Steve Austin y The Rock confirmados como los contendientes para WrestleMania. La Alianza se forma en sombra.', main:'Austin vs. Rock confrontation', network:'USA Network'},
+
+  // MARZO
+  {id:20, type:'smackdown', title:'SMACKDOWN #90', date:'2001-03-01', info:'WrestleMania season arranca. Vince McMahon vs. Shane McMahon anunciado. Undertaker en modo devastador.', main:'Undertaker vs. Big Show', network:'UPN'},
+  {id:21, type:'raw', title:'RAW IS WAR #406', date:'2001-03-05', info:'Chris Jericho vs. William Regal por el Intercontinental Title. Kurt Angle sorprende al público.', main:'Jericho vs. Regal (IC Title) | Austin promo', network:'USA Network'},
+  {id:22, type:'smackdown', title:'SMACKDOWN #91', date:'2001-03-08', info:'Linda McMahon anuncia cambios en la administración. The Dudley Boyz en fuego.', main:'The Rock vs. Undertaker', network:'UPN'},
+  {id:23, type:'raw', title:'RAW IS WAR #407', date:'2001-03-12', info:'Triple H vs. Undertaker en un feroz brawl. Shane McMahon aparece desde ECW con sorpresa.', main:'Triple H vs. Undertaker | Shane arrive from ECW', network:'USA Network'},
+  {id:24, type:'smackdown', title:'SMACKDOWN #92', date:'2001-03-15', info:'WrestleMania X-Seven build-up intenso. Stephanie McMahon traiciona a Vince. ECW invade la WWF.', main:'ECW/WWF Invasion angle begins', network:'UPN'},
+  {id:25, type:'raw', title:'RAW IS WAR #408', date:'2001-03-19', info:'Kurt Angle vs. Chris Benoit en un clásico técnico. The Rock en promo épica contra Austin.', main:'Angle vs. Benoit | Rock promo', network:'USA Network'},
+  {id:26, type:'smackdown', title:'SMACKDOWN #93', date:'2001-03-22', info:'Go-home show para WrestleMania. Todos los matches confirmados. Segmento emotivo de Vince y Shane.', main:'Austin vs. Angle | Vince/Shane confrontation', network:'UPN'},
+  {id:27, type:'ppv', title:'WRESTLEMANIA X-SEVEN', date:'2001-03-29', info:'Considerado el mejor WrestleMania de la historia. Steve Austin vs. The Rock en un épico WWF Championship match donde Austin se alía con Vince McMahon en un shocking heel turn. TLC II con los Hardy Boyz, E&C y Dudleys. Undertaker vs. Triple H en No Holds Barred. Shane McMahon vs. Vince McMahon en un Street Fight brutal. Kurt Angle vs. Chris Benoit. Gimmick Battle Royal legendario.', main:'Austin vs. Rock (WWF Title) | TLC II | Taker vs. HHH | Shane vs. Vince', venue:'Reliant Astrodome, Houston TX'},
+
+  // ABRIL
+  {id:28, type:'raw', title:'RAW IS WAR #409', date:'2001-04-02', info:'Post-WrestleMania RAW histórico. Steve Austin heel como WWF Champion, aliado con Vince McMahon. The Rock promete venganza.', main:'Austin heel promo | Rock demands rematch', network:'USA Network'},
+  {id:29, type:'smackdown', title:'SMACKDOWN #94', date:'2001-04-05', info:'La Alianza McMahon se consolida. Austin destroza al elenco. Edge gana el Intercontinental Title.', main:'Edge vs. Christian (IC Title) | Austin destruction', network:'UPN'},
+  {id:30, type:'raw', title:'RAW IS WAR #410', date:'2001-04-09', info:'The Rock vs. Steve Austin Backlash build. Kurt Angle busca revancha. Raven y Rhyno en ascenso.', main:'Rock vs. Kurt Angle | Rhyno vs. Raven (Hardcore)', network:'USA Network'},
+  {id:31, type:'smackdown', title:'SMACKDOWN #95', date:'2001-04-12', info:'Undertaker vs. Triple H en un último capítulo violento. Chris Jericho abre con gran promo.', main:'Undertaker vs. Triple H (Street Fight) | Jericho promo', network:'UPN'},
+  {id:32, type:'raw', title:'RAW IS WAR #411', date:'2001-04-16', info:'Backlash final build. The Rock vs. Austin en contexto caliente. The Hardys en acción.', main:'The Rock vs. Kurt Angle | Hardys vs. Dudleys', network:'USA Network'},
+  {id:33, type:'smackdown', title:'SMACKDOWN #96', date:'2001-04-19', info:'Go-home para Backlash. Vince McMahon en modo manipulador. Austin provoca a The Rock.', main:'Austin vs. Undertaker | Rock promo', network:'UPN'},
+  {id:34, type:'ppv', title:'BACKLASH 2001', date:'2001-04-29', info:'The Rock desafía a Steve Austin por el WWF Championship. Kurt Angle como árbitro especial. Undertaker y Kane vs. Edge & Christian. Chris Jericho vs. William Regal por el IC Title. Triple H regresa de su lesión cuádruple en un emotivo momento.', main:'Rock vs. Austin (Kurt Angle-SR) | HHH return | Taker/Kane vs. E&C', venue:'Allstate Arena, Chicago'},
+
+  // MAYO
+  {id:35, type:'raw', title:'RAW IS WAR #412', date:'2001-04-30', info:'Post-Backlash. Triple H en su regreso pleno al ring. The Invasion de WCW/ECW se intensifica.', main:'Triple H returns | Austin celebration', network:'USA Network'},
+  {id:36, type:'smackdown', title:'SMACKDOWN #97', date:'2001-05-03', info:'WCW cambia de manos. Shane McMahon confirma la compra de WCW. The Alliance comienza.', main:'Shane McMahon WCW announcement | Austin vs. HHH', network:'UPN'},
+  {id:37, type:'raw', title:'RAW IS WAR #413', date:'2001-05-07', info:'Primeros luchadores de WCW aparecen en RAW. Buff Bagwell y Booker T hacen apariciones impactantes.', main:'WCW invasion begins | Booker T appearance', network:'USA Network'},
+  {id:38, type:'smackdown', title:'SMACKDOWN #98', date:'2001-05-10', info:'Kurt Angle busca recuperar el WWF Title. Chris Jericho en fuego. Trish Stratus abierta como face.', main:'Kurt Angle vs. Chris Benoit | Jericho vs. HHH', network:'UPN'},
+  {id:39, type:'raw', title:'RAW IS WAR #414', date:'2001-05-14', info:'Primer RAW con presencia abierta de The Alliance. Chris Jericho conquista el IC Title.', main:'Jericho vs. HHH (IC Title) | Alliance promo', network:'USA Network'},
+  {id:40, type:'smackdown', title:'SMACKDOWN #99', date:'2001-05-17', info:'Juggernaut build hacia Judgment Day. Raven defiende el Hardcore title en un caos total.', main:'Raven vs. Big Show (Hardcore) | Austin vs. Angle', network:'UPN'},
+  {id:41, type:'raw', title:'RAW IS WAR #415', date:'2001-05-21', info:'Go-home para Judgment Day. Steve Austin vs. Triple H es el foco. The Rock regresa desde Hollywood.', main:'Austin vs. Chris Benoit | HHH/Austin confrontation', network:'USA Network'},
+  {id:42, type:'smackdown', title:'SMACKDOWN #100', date:'2001-05-24', info:'EPISODIO 100 de SmackDown! Celebración histórica. Kurt Angle en un épico match. Undertaker cierra el show.', main:'Angle vs. Rock | Undertaker vs. Kane', network:'UPN'},
+  {id:43, type:'ppv', title:'JUDGMENT DAY 2001', date:'2001-05-20', info:'Steve Austin vs. Triple H por el WWF Championship. The Brothers of Destruction (Undertaker & Kane) se unen. Edge vs. Christian en un feud personal. Chris Benoit vs. Kurt Angle. Rhyno vs. Tajiri. Shane McMahon en acción contra Big Show.', main:'Austin vs. HHH (WWF Title) | Taker/Kane vs. Dudleys | Angle vs. Benoit', venue:'Savvis Center, St. Louis'},
+
+  // JUNIO
+  {id:44, type:'raw', title:'RAW IS WAR #416', date:'2001-05-28', info:'The Alliance consolida su poder. ECW y WCW juntos contra la WWF. Chris Jericho como anti-hero.', main:'Alliance promo dominates | Jericho vs. Rhyno', network:'USA Network'},
+  {id:45, type:'smackdown', title:'SMACKDOWN #101', date:'2001-05-31', info:'Diamond Dallas Page hace su aparición en WWF de manera sorpresiva acechando a The Undertaker.', main:'DDP debuts | Austin vs. HHH aftermath', network:'UPN'},
+  {id:46, type:'raw', title:'RAW IS WAR #417', date:'2001-06-04', info:'The Rock regresa de Hollywood para ayudar a la WWF. DDP acosa a Sara, esposa del Undertaker.', main:'The Rock returns | DDP stalks Sara', network:'USA Network'},
+  {id:47, type:'smackdown', title:'SMACKDOWN #102', date:'2001-06-07', info:'Kurt Angle face definitivo. Chris Jericho y Chris Benoit como team. The Alliance ataca.', main:'Angle & Rock vs. Austin & Benoit', network:'UPN'},
+  {id:48, type:'raw', title:'RAW IS WAR #418', date:'2001-06-11', info:'King of the Ring qualifier matches. Steve Austin retiene en situaciones duras. The Alliance crece.', main:'KOTR Qualifiers | Austin vs. Undertaker', network:'USA Network'},
+  {id:49, type:'smackdown', title:'SMACKDOWN #103', date:'2001-06-14', info:'Más clasificatorias para King of the Ring. Edge en ascenso meteórico. Tajiri impresiona.', main:'Edge vs. Christian KOTR | Tajiri vs. Rhyno', network:'UPN'},
+  {id:50, type:'raw', title:'RAW IS WAR #419', date:'2001-06-18', info:'King of the Ring semifinales. Edge vs. Christian se encamina a la final. The Rock promueve la WWF.', main:'KOTR Semis | Rock vs. Angle', network:'USA Network'},
+  {id:51, type:'smackdown', title:'SMACKDOWN #104', date:'2001-06-21', info:'Go-home para King of the Ring. Undertaker busca a DDP. Shane McMahon confirma nueva estrategia.', main:'Taker vs. DDP brawl | Shane McMahon promo', network:'UPN'},
+  {id:52, type:'ppv', title:'KING OF THE RING 2001', date:'2001-06-24', info:'Edge gana el King of the Ring Tournament. Promueve su slogan "YOU THINK YOU KNOW ME". Steve Austin retiene el WWF Championship. Shane McMahon vs. Big Show en un match brutal. Chris Jericho vs. Chris Benoit. The Undertaker vs. Diamond Dallas Page en casket match.', main:'EDGE wins KOTR | Austin vs. Jericho | Taker vs. DDP', venue:'Continental Airlines Arena, NJ'},
+
+  // JULIO
+  {id:53, type:'raw', title:'RAW IS WAR #420', date:'2001-06-25', info:'Post-KOTR. Edge es coronado "King". The Alliance declara guerra abierta. Booker T desafía a Stone Cold.', main:'Edge coronation | Alliance War declaration', network:'USA Network'},
+  {id:54, type:'smackdown', title:'SMACKDOWN #105', date:'2001-06-28', info:'Booker T defiende el WCW Title en SmackDown. The Rock regresa para enfrentar a la Alliance.', main:'Booker T vs. The Rock (WCW Title) | Austin promo', network:'UPN'},
+  {id:55, type:'raw', title:'RAW IS WAR #421', date:'2001-07-02', info:'Invasion build-up. The Alliance crece con figuras de WCW/ECW. Tajiri en una carrera increíble.', main:'Alliance vs. WWF brawl | Tajiri vs. X-Pac', network:'USA Network'},
+  {id:56, type:'smackdown', title:'SMACKDOWN #106', date:'2001-07-05', info:'Stephanie McMahon se une a la Alliance como la nueva dueña de ECW. Impactante revelación.', main:'Stephanie joins Alliance | Alliance domination', network:'UPN'},
+  {id:57, type:'raw', title:'RAW IS WAR #422', date:'2001-07-09', info:'WWF vs. Alliance en guerras campales. Chris Jericho vuelve a ser protagonista. Hardys en fuego.', main:'WWF vs. Alliance tag match | Jericho vs. Rhyno', network:'USA Network'},
+  {id:58, type:'smackdown', title:'SMACKDOWN #107', date:'2001-07-12', info:'Invasion PPV build-up máximo. Steve Austin ahora es parte de The Alliance en un shocking turn.', main:'Austin joins Alliance | Rock declares war', network:'UPN'},
+  {id:59, type:'raw', title:'RAW IS WAR #423', date:'2001-07-16', info:'La WWF refuerza con Kurt Angle. Chris Jericho y Chris Benoit defienden los títulos de pareja.', main:'Jericho & Benoit vs. Dudleys (Tag Titles) | Rock/Angle promo', network:'USA Network'},
+  {id:60, type:'smackdown', title:'SMACKDOWN #108', date:'2001-07-19', info:'Go-home para Invasion. Cada luchador toma partido. The Rock como líder de la WWF.', main:'Team WWF vs. Team Alliance brawl', network:'UPN'},
+  {id:61, type:'ppv', title:'INVASION 2001', date:'2001-07-22', info:'The Alliance vs. WWF en el evento del año. Team WWF (The Rock, Chris Jericho, Undertaker, Kane, Kurt Angle) vs. Team Alliance (Stone Cold, Booker T, Rhyno, Dudley Boyz, Shane McMahon). Steve Austin traiciona a la WWF. La Alliance gana pero la guerra continúa. Uno de los PPVs más calientes de la historia.', main:'Team WWF vs. Team Alliance | Austin betrayal | 10-man tag war', venue:'Gund Arena, Cleveland'},
+
+  // AGOSTO
+  {id:62, type:'raw', title:'RAW IS WAR #424', date:'2001-07-23', info:'Post-Invasion. La Alliance celebra. The Rock jura venganza. Kurt Angle se convierte en el baluarte de la WWF.', main:'Alliance celebration | Angle declares war', network:'USA Network'},
+  {id:63, type:'smackdown', title:'SMACKDOWN #109', date:'2001-07-26', info:'Stone Cold como miembro de la Alliance. Booker T y Austin dominan. Rob Van Dam hace su debut en WWF!', main:'RVD debuts! | Austin vs. The Rock', network:'UPN'},
+  {id:64, type:'raw', title:'RAW IS WAR #425', date:'2001-07-30', info:'Rob Van Dam en una batalla de alta vuelta contra Jeff Hardy. La Alliance vs. WWF sigue ardiendo.', main:'RVD vs. Jeff Hardy (ladder match) | Austin promo', network:'USA Network'},
+  {id:65, type:'smackdown', title:'SMACKDOWN #110', date:'2001-08-02', info:'SummerSlam build-up. Chris Jericho vs. Rhyno en un brutal match. La Alliance ataca en masa.', main:'Jericho vs. Rhyno | Angle vs. Booker T', network:'UPN'},
+  {id:66, type:'raw', title:'RAW IS WAR #426', date:'2001-08-06', info:'The Rock vs. Booker T anunciado para SummerSlam. Kurt Angle vs. Steve Austin también set.', main:'Rock vs. Booker T | SummerSlam card reveals', network:'USA Network'},
+  {id:67, type:'smackdown', title:'SMACKDOWN #111', date:'2001-08-09', info:'Lita defiende el WWF Women\'s Championship. Edge en fuego como King of the Ring. RVD impresiona.', main:'Lita vs. Trish (Women\'s Title) | RVD vs. Edge', network:'UPN'},
+  {id:68, type:'raw', title:'RAW IS WAR #427', date:'2001-08-13', info:'Go-home para SummerSlam. La Alliance y la WWF en tensión máxima. Austin vs. Rock feud eterno.', main:'Austin vs. Angle | Rock vs. Booker T confrontation', network:'USA Network'},
+  {id:69, type:'smackdown', title:'SMACKDOWN #112', date:'2001-08-16', info:'Último SmackDown antes de SummerSlam. Todos los contendientes cara a cara. Brutal segmento final.', main:'Complete roster face-off | Shane McMahon promo', network:'UPN'},
+  {id:70, type:'ppv', title:'SUMMERSLAM 2001', date:'2001-08-19', info:'The Rock vs. Booker T por el WCW Championship. Kurt Angle vs. Steve Austin por el WWF Championship. Chris Jericho y Chris Benoit vs. Edge & Christian por los Tag Titles. Rob Van Dam vs. Jeff Hardy por el Hardcore Title. Undertaker vs. Test. Lita vs. Torrie Wilson. EPIC night in San Jose.', main:'Rock vs. Booker T | Angle vs. Austin | RVD vs. Hardy | Jericho/Benoit vs. E&C', venue:'Compaq Center, San Jose'},
+
+  // SEPTIEMBRE
+  {id:71, type:'raw', title:'RAW IS WAR #428', date:'2001-08-20', info:'Post-SummerSlam. Kurt Angle es campeón de la WWF. The Alliance busca venganza. RVD en ascenso.', main:'Angle new champ | Alliance retaliation', network:'USA Network'},
+  {id:72, type:'smackdown', title:'SMACKDOWN #113', date:'2001-08-23', info:'The Rock pierde el WCW Title. Booker T dominante. Chris Jericho busca el Undisputed Championship.', main:'Booker T vs. The Rock | Jericho promo', network:'UPN'},
+  {id:73, type:'raw', title:'RAW IS WAR #429', date:'2001-08-27', info:'Steve Austin busca revancha ante Kurt Angle. Shane McMahon en crisis. Stephanie se afirma como líder de ECW.', main:'Austin vs. Kurt Angle (non-title) | Stephanie promo', network:'USA Network'},
+  {id:74, type:'smackdown', title:'SMACKDOWN #114', date:'2001-08-30', info:'Rob Van Dam vs. Edge en un match de atletismo puro. The Alliance sigue dominando SmackDown.', main:'RVD vs. Edge | Alliance control of SD', network:'UPN'},
+  {id:75, type:'raw', title:'RAW IS WAR #430', date:'2001-09-03', info:'Unforgiven build-up. Chris Jericho vs. Austin por primera vez. The Rock en entrenamiento intenso.', main:'Austin vs. Jericho | Rock training montage', network:'USA Network'},
+  {id:76, type:'smackdown', title:'SMACKDOWN #115', date:'2001-09-06', info:'Kurt Angle vs. Booker T en un choque de campeones. La Alliance busca los dos títulos principales.', main:'Angle vs. Booker T (Champions collision) | RVD match', network:'UPN'},
+  {id:77, type:'raw', title:'RAW IS WAR #431', date:'2001-09-10', info:'Último RAW antes del 11-S. La cartelera de la WWF en su pico de talento.', main:'Austin vs. Rob Van Dam | Rock/Angle alliance', network:'USA Network'},
+  {id:78, type:'smackdown', title:'SMACKDOWN #116', date:'2001-09-13', info:'Primer SmackDown post-11 de septiembre. Emocionante episodio de tributo a las víctimas con los luchadores sin kayfabe.', main:'Tribute episode — SmackDown returns after 9/11 pause', network:'UPN'},
+  {id:79, type:'raw', title:'RAW IS WAR #432', date:'2001-09-17', info:'RAW post-9/11. Emotivo regreso. Vince McMahon y toda la nómina rinden tributo a América. Evento cargado de emoción real.', main:'America tribute RAW | Emotional open | Full roster', network:'USA Network'},
+  {id:80, type:'smackdown', title:'SMACKDOWN #117', date:'2001-09-20', info:'SmackDown se normaliza. Unforgiven build-up. Chris Jericho busca el WWF Title de forma agresiva.', main:'Jericho vs. Angle | Alliance vs. WWF tag war', network:'UPN'},
+  {id:81, type:'ppv', title:'UNFORGIVEN 2001', date:'2001-09-23', info:'Kurt Angle vs. Steve Austin por el WWF Championship. Rob Van Dam vs. Chris Jericho. The Rock vs. Booker T en la última batalla del WCW Title. Undertaker & Kane en acción. La Alliance comienza a fracturar por dentro. Memorable PPV de otoño.', main:'Angle vs. Austin | RVD vs. Jericho | Rock vs. Booker T', venue:'Savvis Center, Pittsburgh'},
+
+  // OCTUBRE
+  {id:82, type:'raw', title:'RAW IS WAR #433', date:'2001-09-24', info:'Post-Unforgiven. La Alliance en crisis. Steve Austin y Kurt Angle se tienen respeto forzado. Jericho asciende.', main:'Austin/Angle aftermath | Jericho celebration', network:'USA Network'},
+  {id:83, type:'smackdown', title:'SMACKDOWN #118', date:'2001-09-27', info:'La Alliance busca liderazgo. Stephanie McMahon confronta a Vince. Shane McMahon en el ojo del huracán.', main:'Shane vs. Vince confrontation | Alliance meeting', network:'UPN'},
+  {id:84, type:'raw', title:'RAW IS WAR #434', date:'2001-10-01', info:'No Mercy build-up. Kurt Angle vs. The Rock en un feud de ensueño. Stone Cold en modo psicópata.', main:'Angle vs. Rock | Austin destroys locker room', network:'USA Network'},
+  {id:85, type:'smackdown', title:'SMACKDOWN #119', date:'2001-10-04', info:'Chris Jericho en su mejor momento de 2001. Rob Van Dam defiende el Hardcore Title ante múltiples rivales.', main:'Jericho vs. The Rock | RVD Hardcore defense', network:'UPN'},
+  {id:86, type:'raw', title:'RAW IS WAR #435', date:'2001-10-08', info:'La Alliance comienza a fracturarse. Austin y Angle en la WWF de nuevo juntos como equipo forzado.', main:'Austin & Angle forced team | Rock challenge', network:'USA Network'},
+  {id:87, type:'smackdown', title:'SMACKDOWN #120', date:'2001-10-11', info:'No Mercy go-home. Todos los matches definidos. Vince McMahon hace una promesa ante la audiencia.', main:'Vince McMahon promise | Austin vs. RVD', network:'UPN'},
+  {id:88, type:'ppv', title:'NO MERCY 2001', date:'2001-10-21', info:'Steve Austin vs. Kurt Angle vs. Rob Van Dam por el WWF Championship. The Rock vs. Chris Jericho. Undertaker vs. Booker T por el WCW Title. Edge vs. Test. Chris Benoit en acción. Incredible three-way for the ages. La Alliance en sus últimas semanas.', main:'Austin vs. Angle vs. RVD | Rock vs. Jericho | Taker vs. Booker T', venue:'Pepsi Arena, Albany NY'},
+  {id:89, type:'raw', title:'RAW IS WAR #436', date:'2001-10-22', info:'Post-No Mercy. The Alliance al borde del colapso. Steve Austin vuelve a liderar la WWF.', main:'Austin championship celebration | Jericho declaration', network:'USA Network'},
+  {id:90, type:'smackdown', title:'SMACKDOWN #121', date:'2001-10-25', info:'Survivor Series build. La Alliance en últimas. Booker T y Shane McMahon buscan salvar la facción.', main:'Shane McMahon speech | Booker T vs. Undertaker', network:'UPN'},
+  {id:91, type:'raw', title:'RAW IS WAR #437', date:'2001-10-29', info:'Halloween special RAW. Chris Jericho busca coronarse Undisputed Champion. Angle y Austin en el mismo ring.', main:'Halloween RAW | Jericho vs. Austin | Angle confrontation', network:'USA Network'},
+
+  // NOVIEMBRE
+  {id:92, type:'smackdown', title:'SMACKDOWN #122', date:'2001-11-01', info:'Survivor Series build intenso. Los equipos se forman. Kurt Angle lidera Team WWF.', main:'Team WWF vs. Team Alliance build | Angle vs. Booker T', network:'UPN'},
+  {id:93, type:'raw', title:'RAW IS WAR #438', date:'2001-11-05', info:'Team Alliance y Team WWF anunciados para Survivor Series. The Rock regresa para unirse al equipo WWF.', main:'Survivor Series teams announced | Rock return speech', network:'USA Network'},
+  {id:94, type:'smackdown', title:'SMACKDOWN #123', date:'2001-11-08', info:'Shane y Stephanie McMahon en modo desesperado. Vince McMahon supremamente confiado. Battle lines drawn.', main:'Shane/Steph vs. Vince promo | Rock & Angle vs. Austin & Jericho', network:'UPN'},
+  {id:95, type:'raw', title:'RAW IS WAR #439', date:'2001-11-12', info:'Chris Jericho traiciona al equipo de la WWF. Uno de los heel turns más impactantes del año. Jericho se une a la Alliance.', main:'JERICHO HEEL TURN | Alliance celebration | Rock furious', network:'USA Network'},
+  {id:96, type:'smackdown', title:'SMACKDOWN #124', date:'2001-11-15', info:'Go-home para Survivor Series. Cada luchador hace su declaración final. Epicidad en el aire.', main:'Pre-Survivor Series show | Full roster promos', network:'UPN'},
+  {id:97, type:'ppv', title:'SURVIVOR SERIES 2001', date:'2001-11-18', info:'EL FINAL DE THE ALLIANCE. Team WWF (The Rock, Chris Jericho, Undertaker, Kane, Big Show) vs. Team Alliance (Steve Austin, Kurt Angle, Booker T, Shane McMahon, Rob Van Dam) en un brutal Survivor Series match. La WWF gana y la Alliance es disuelta. Chris Jericho gana el WWF Undisputed Championship como heel. Noche histórica en todos los sentidos.', main:'Team WWF vs Team Alliance | JERICHO wins Undisputed Title | Alliance ENDS', venue:'Pepsi Arena, Greensboro NC'},
+  {id:98, type:'raw', title:'RAW IS WAR #440', date:'2001-11-19', info:'Post-Survivor Series. Chris Jericho es el primer Undisputed WWF Champion. The Alliance es oficialmente disuelta. La era Attitude cierra.', main:'JERICHO as Undisputed Champ | Alliance disbands | Rock demands rematch', network:'USA Network'},
+  {id:99, type:'smackdown', title:'SMACKDOWN #125', date:'2001-11-22', info:'Chris Jericho celebra el título Undisputed. The Rock busca venganza. Steve Austin en transición. Era post-Alliance.', main:'Jericho promo | Rock vs. Austin (non-title) | New WWF era begins', network:'UPN'},
+  {id:100, type:'raw', title:'RAW IS WAR #441', date:'2001-11-26', info:'Vengeance build. Jericho vs. The Rock y Jericho vs. Stone Cold Austin anunciados para Vengeance en un mismo PPV.', main:'Vengeance card revealed | Jericho vs. Austin #1 | Rock interview', network:'USA Network'},
+  {id:101, type:'smackdown', title:'SMACKDOWN #126', date:'2001-11-29', info:'Vengeance go-home show. Jericho en su peor versión arrogante como campeón. Triple H regresa y apunta al título.', main:'Jericho celebration | Triple H return angle | Rock/Austin contract signing', network:'UPN'},
+
+  // DICIEMBRE
+  {id:102, type:'raw', title:'RAW IS WAR #442', date:'2001-12-03', info:'Triple H de vuelta a plena potencia. Vengeance build en su pico. The Rock vs. Austin en rivalidad eterna que continúa.', main:'Triple H vs. Jericho promo | Rock vs. Austin pre-Vengeance', network:'USA Network'},
+  {id:103, type:'smackdown', title:'SMACKDOWN #127', date:'2001-12-06', info:'Chris Jericho se burla de todos los contendientes. Kurt Angle busca un lugar en el main event de Vengeance.', main:'Jericho vs. Undertaker | Angle vs. RVD', network:'UPN'},
+  {id:104, type:'raw', title:'RAW IS WAR #443', date:'2001-12-10', info:'Go-home para Vengeance. Los dos matches del Undisputed Title confirmados. Triple H acepta desafiar al ganador en Royal Rumble 2002.', main:'Vengeance final build | HHH-winner announcement | All-star promo', network:'USA Network'},
+  {id:105, type:'smackdown', title:'SMACKDOWN #128', date:'2001-12-13', info:'Último SmackDown antes de Vengeance. Todos los luchadores en modo final. Jericho cierra el show con arrogancia suprema.', main:'Last pre-Vengeance SD | Jericho final promo | Undercard battles', network:'UPN'},
+  {id:106, type:'ppv', title:'VENGEANCE 2001', date:'2001-12-09', info:'Chris Jericho defiende el Undisputed Title contra The Rock Y contra Steve Austin en la misma noche. Jericho vence a The Rock primero, luego vence a Steve Austin para retener. Triple H apunta al título en 2002. Edge vs. William Regal por el IC Title. Undertaker vs. Rob Van Dam. Final del año en grande.', main:'Jericho vs. Rock | Jericho vs. Austin | Edge vs. Regal | Taker vs. RVD', venue:'Staples Center, Los Angeles'},
+  {id:107, type:'raw', title:'RAW IS WAR #444', date:'2001-12-10', info:'Post-Vengeance. Jericho supremo con el Undisputed Title. The Rock y Austin humillados. Triple H apunta a Royal Rumble 2002.', main:'Jericho celebration | HHH-Jericho confrontation | 2002 tease', network:'USA Network'},
+  {id:108, type:'smackdown', title:'SMACKDOWN #129', date:'2001-12-13', info:'La era 2001 llega a su final. Chris Jericho en su cima. Triple H como el próximo gran reto. The Rock abandona temporalmente.', main:'Jericho vs. Rock final encounter 2001 | HHH promo | Year recap', network:'UPN'},
+  {id:109, type:'raw', title:'RAW IS WAR #445', date:'2001-12-17', info:'Navidad especial RAW. Holiday episode con momentos de humor y calidad. Jericho sigue brillando.', main:'Holiday RAW | Jericho arrogance | Austin/HHH segments', network:'USA Network'},
+  {id:110, type:'smackdown', title:'SMACKDOWN #130', date:'2001-12-20', info:'SmackDown navideño. El año 2001 se despide. La WWF ya mira hacia 2002 y Royal Rumble.', main:'Christmas SmackDown | Year-end celebration | 2002 preview', network:'UPN'},
+  {id:111, type:'raw', title:'RAW IS WAR #446', date:'2001-12-24', info:'Christmas Eve RAW. Episodio especial de Nochebuena. Toda la nómina presente para el cierre del año Attitude.', main:'Christmas Eve special | Full roster | Jericho promo final', network:'USA Network'},
+  {id:112, type:'smackdown', title:'SMACKDOWN #131', date:'2001-12-27', info:'Último SmackDown del 2001. La Attitude Era cierra con todo su esplendor. Jericho como campeón. La WWF mira al futuro.', main:'LAST SD OF 2001 | Year recap | Jericho closes the year as Undisputed Champ', network:'UPN'},
+  {id:113, type:'raw', title:'RAW IS WAR #447', date:'2001-12-31', info:'ÚLTIMO RAW DEL 2001. New Year\'s Eve RAW. El año más loco del wrestling cierra con una explosión. Chris Jericho, Triple H, Kurt Angle, Steve Austin todos en el ring. La Attitude Era despide 2001 en grande.', main:'NEW YEAR\'S EVE RAW 2001 | Full star-studded card | Attitude Era closes 2001', network:'USA Network'}
+];
+
+let watched = JSON.parse(localStorage.getItem('wwf2001') || '{}');
+let currentFilter = 'all';
+let isNight = true;
+
+function toggleNight() {
+  isNight = !isNight;
+  document.body.classList.toggle('light', !isNight);
+  document.getElementById('nightBtn').textContent = isNight ? '☀ DÍA' : '🌙 NOCHE';
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.className = 'filter-btn';
+  });
+  btn.className = `filter-btn active-${f}`;
+  renderList();
+}
+
+function toggleWatch(id) {
+  watched[id] = !watched[id];
+  if (!watched[id]) delete watched[id];
+  localStorage.setItem('wwf2001', JSON.stringify(watched));
+  renderList();
+}
+
+function toggleDetail(id) {
+  const card = document.getElementById('card-' + id);
+  card.classList.toggle('open');
+}
+
+function renderList() {
+  const main = document.getElementById('mainList');
+  let filtered = EVENTS;
+  if (currentFilter === 'raw') filtered = EVENTS.filter(e => e.type === 'raw');
+  else if (currentFilter === 'smackdown') filtered = EVENTS.filter(e => e.type === 'smackdown');
+  else if (currentFilter === 'ppv') filtered = EVENTS.filter(e => e.type === 'ppv');
+  else if (currentFilter === 'watched') filtered = EVENTS.filter(e => watched[e.id]);
+  else if (currentFilter === 'unwatched') filtered = EVENTS.filter(e => !watched[e.id]);
+
+  if (filtered.length === 0) {
+    main.innerHTML = '<div class="empty-state">— NO HAY RESULTADOS —</div>';
+    updateStats();
+    return;
+  }
+
+  // group by month
+  const byMonth = {};
+  filtered.forEach(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const m = d.getMonth();
+    if (!byMonth[m]) byMonth[m] = [];
+    byMonth[m].push(e);
+  });
+
+  let html = '';
+  Object.keys(byMonth).sort((a,b) => a-b).forEach(m => {
+    const events = byMonth[m];
+    const total = events.length;
+    const done = events.filter(e => watched[e.id]).length;
+    html += `<div class="month-group">
+      <div class="month-label">${MONTHS[m]} <span class="month-count">${done}/${total} vistos</span></div>`;
+    events.forEach(e => {
+      const d = new Date(e.date + 'T12:00:00');
+      const dayNames = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+      const dateStr = `${dayNames[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()].substring(0,3)} ${d.getFullYear()}`;
+      const isW = watched[e.id];
+      const RAW_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNDgiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDgiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJyZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmYyMjAwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzg4MDAwMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNyZykiIHJ4PSIyIi8+CiAgPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjExNCIgaGVpZ2h0PSI0MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmY2NjQ0IiBzdHJva2Utd2lkdGg9IjEiIHJ4PSIxIiBvcGFjaXR5PSIwLjUiLz4KICA8dGV4dCB4PSI2MCIgeT0iMjIiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI0Ij5SQVc8L3RleHQ+CiAgPHRleHQgeD0iNjAiIHk9IjM4IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZjY2FhIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNSI+SVMgIFdBUjwvdGV4dD4KPC9zdmc+';
+      const SD_LOGO  = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgNDgiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDgiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJzZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDA1NWRkIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMTE3NyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNzZykiIHJ4PSIyIi8+CiAgPHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjExNCIgaGVpZ2h0PSI0MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDQ4OGZmIiBzdHJva2Utd2lkdGg9IjEiIHJ4PSIxIiBvcGFjaXR5PSIwLjUiLz4KICA8dGV4dCB4PSI2MCIgeT0iMTkiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxJbXBhY3Qsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxIj5TTUFDSzwvdGV4dD4KICA8bGluZSB4MT0iMTAiIHkxPSIyOCIgeDI9IjExMCIgeTI9IjI4IiBzdHJva2U9IiNmNWM1MTgiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC42Ii8+CiAgPHRleHQgeD0iNjAiIHk9IjM4IiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssSW1wYWN0LHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNmNWM1MTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIyIj5ET1dOITwvdGV4dD4KPC9zdmc+';
+      const badgeClass = e.type === 'raw' ? 'badge-raw' : e.type === 'smackdown' ? 'badge-smackdown' : 'badge-ppv';
+      const badgeInner = e.type === 'raw'
+        ? `<img src="${RAW_LOGO}" class="badge-logo" alt="RAW" loading="lazy">`
+        : e.type === 'smackdown'
+        ? `<img src="${SD_LOGO}" class="badge-logo" alt="SmackDown!" loading="lazy">`
+        : 'PPV';
+      html += `<div class="event-card type-${e.type}${isW ? ' watched' : ''}" id="card-${e.id}">
+        <div class="event-main">
+          <button class="check-btn" onclick="event.stopPropagation(); toggleWatch(${e.id})" title="Marcar como visto">✓</button>
+          <span class="type-badge ${badgeClass}">${badgeInner}</span>
+          <div class="event-info" onclick="toggleDetail(${e.id})">
+            <div class="event-title">${e.title}</div>
+            <div class="event-date">${dateStr}</div>
+          </div>
+          <span class="expand-icon" onclick="toggleDetail(${e.id})">▾</span>
+        </div>
+        <div class="event-detail">
+          <div class="detail-section">
+            <div class="detail-label">📋 Descripción</div>
+            <div class="detail-value">${e.info}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">🥊 Main Event</div>
+            <div class="detail-value">${e.main}</div>
+          </div>
+          ${e.venue ? `<div class="detail-section"><div class="detail-label">📍 Venue</div><div class="detail-value">${e.venue}</div></div>` : ''}
+          ${e.network ? `<div class="detail-section"><div class="detail-label">📺 Canal</div><div class="detail-value">${e.network}</div></div>` : ''}
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  main.innerHTML = html;
+  updateStats();
+}
+
+function updateStats() {
+  const totalWatched = Object.keys(watched).length;
+  const total = EVENTS.length;
+  const pct = total > 0 ? Math.round(totalWatched / total * 100) : 0;
+  document.getElementById('progressLabel').textContent = `${totalWatched} / ${total} VISTOS — ${pct}%`;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('statRaw').textContent = `RAW: ${EVENTS.filter(e=>e.type==='raw' && watched[e.id]).length}/${EVENTS.filter(e=>e.type==='raw').length}`;
+  document.getElementById('statSD').textContent = `SD!: ${EVENTS.filter(e=>e.type==='smackdown' && watched[e.id]).length}/${EVENTS.filter(e=>e.type==='smackdown').length}`;
+  document.getElementById('statPPV').textContent = `PPV: ${EVENTS.filter(e=>e.type==='ppv' && watched[e.id]).length}/${EVENTS.filter(e=>e.type==='ppv').length}`;
+  document.getElementById('statWatched').textContent = `✓ ${totalWatched}`;
+}
+
+// Save scroll position on scroll
+let scrollSaveTimer;
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('scrollTop');
+  btn.classList.toggle('visible', window.scrollY > 300);
+
+  // Save scroll position debounced
+  clearTimeout(scrollSaveTimer);
+  scrollSaveTimer = setTimeout(() => {
+    localStorage.setItem('wwf2001_scroll', window.scrollY);
+
+    // Save visible month
+    const monthGroups = document.querySelectorAll('.month-group');
+    let currentMonth = '';
+    monthGroups.forEach(group => {
+      const rect = group.getBoundingClientRect();
+      if (rect.top <= 120) {
+        const label = group.querySelector('.month-label');
+        if (label) currentMonth = label.childNodes[0].textContent.trim();
+      }
+    });
+    if (currentMonth) localStorage.setItem('wwf2001_month', currentMonth);
+  }, 300);
+});
+
+// Restore scroll position after render
+function restoreScroll() {
+  const savedMonth = localStorage.getItem('wwf2001_month');
+  const savedScroll = parseInt(localStorage.getItem('wwf2001_scroll') || '0');
+
+  if (savedMonth && currentFilter === 'all') {
+    // Find the month group by label text and scroll to it
+    const monthGroups = document.querySelectorAll('.month-group');
+    for (const group of monthGroups) {
+      const label = group.querySelector('.month-label');
+      if (label && label.childNodes[0].textContent.trim() === savedMonth) {
+        setTimeout(() => {
+          const headerH = document.querySelector('.header').offsetHeight + 10;
+          const top = group.getBoundingClientRect().top + window.scrollY - headerH;
+          window.scrollTo({ top, behavior: 'instant' });
+        }, 50);
+        return;
+      }
+    }
+  } else if (savedScroll > 0) {
+    setTimeout(() => window.scrollTo({ top: savedScroll, behavior: 'instant' }), 50);
+  }
+}
+
+// Show toast with current month on load
+function showMonthToast(month) {
+  if (!month) return;
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+    background:#cc0000; color:white; padding:8px 20px;
+    font-family:'Oswald',sans-serif; font-size:0.85rem; letter-spacing:2px;
+    border-radius:2px; z-index:200; opacity:0;
+    transition:opacity 0.3s; white-space:nowrap;
+    box-shadow: 0 4px 15px rgba(204,0,0,0.4);
+  `;
+  toast.textContent = '📍 ' + month;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.style.opacity = '1', 100);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 2500);
+}
+
+renderList();
+const _savedMonth = localStorage.getItem('wwf2001_month');
+restoreScroll();
+if (_savedMonth) showMonthToast(_savedMonth);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register("data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZSA9PiBzZWxmLnNraXBXYWl0aW5nKCkpOwpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2FjdGl2YXRlJywgZSA9PiBjbGllbnRzLmNsYWltKCkpOwpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZSA9PiB7CiAgZS5yZXNwb25kV2l0aChmZXRjaChlLnJlcXVlc3QpLmNhdGNoKCgpID0+IG5ldyBSZXNwb25zZSgnT2ZmbGluZSAtIFdXRiAyMDAxIFRyYWNrZXInKSkpOwp9KTs=").then(() => {
+    console.log('SW registered OK');
+  }).catch(err => console.log('SW skipped:', err));
+}
+</script>
+</body>
+</html>
